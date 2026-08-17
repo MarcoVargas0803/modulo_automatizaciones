@@ -29,15 +29,7 @@ router.get("/data-quality", requireAuth, async (req, res) => {
           ('workflow_execution_error_without_message'),
           ('workflow_events_error_without_message')
       )
-      -- El filtro por proceso accesible se queda aquí y no en la vista: este
-      -- endpoint solo lleva requireAuth, así que ESTE cruce es su control de
-      -- acceso y tiene que aplicarse antes de contar. Es también la razón por la
-      -- que no se puede consumir audit_portal.v_audit_data_quality, que entrega
-      -- los conteos ya agregados y sin filtrar.
-      --
-      -- requires_access = FALSE son las ejecuciones huérfanas (sin process_code
-      -- o con uno fuera del catálogo): no se filtran porque no hay proceso al
-      -- que atribuirlas, y cruzarlas daría 0 siempre.
+    
       SELECT
         t.issue_type,
         COUNT(q.issue_type)::INT AS total

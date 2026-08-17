@@ -107,19 +107,12 @@ async function loginUser(username, password, options = {}) {
     console.error('No se pudo registrar el ultimo acceso:', error.message);
   }
 
-  // A partir de aqui las credenciales ya son validas y lo que se decide es la
-  // SESION. Todo en una transaccion porque comprobar "hay sesion viva" e
-  // insertar la nueva tienen que ser un solo paso: sin el bloqueo de abajo, dos
-  // logins simultaneos del mismo usuario leerian los dos "no hay sesion" y
-  // acabarian con dos sesiones vivas, que es justo lo que este modulo impide.
+ 
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
-    // Serializa los logins de ESTE usuario. Se bloquea la fila de users y no las
-    // de user_sessions porque cuando no hay ninguna sesion no habria nada que
-    // bloquear, que es precisamente el caso de la carrera.
     await client.query(
       'SELECT user_id FROM audit_portal.users WHERE user_id = $1 FOR UPDATE;',
       [user.user_id],
@@ -137,8 +130,6 @@ async function loginUser(username, password, options = {}) {
       };
     }
 
-    // Barre tambien las sesiones ociosas, que no bloqueaban pero seguian siendo
-    // validas: si no, el dispositivo abandonado conservaria un token utilizable.
     await revokeUserSessions(client, user.user_id, 'replaced');
 
     const sessionId = newSessionId();
@@ -159,8 +150,6 @@ async function loginUser(username, password, options = {}) {
       }
     );
 
-    // La caducidad de la fila se lee del token ya firmado en vez de recalcularse
-    // a partir de JWT_EXPIRES_IN: asi la sesion y el token no pueden desalinearse.
     const expiresAt = new Date(jwt.decode(token).exp * 1000);
 
     await createSession(client, {
@@ -191,14 +180,6 @@ async function loginUser(username, password, options = {}) {
   }
 }
 
-/**
- * Perfil del usuario y procesos a los que tiene acceso.
- *
- * Se llamaba `getUserSession` y el nombre enganaba: no sabe nada de sesiones
- * —son dos SELECT de perfil y permisos— pero hacia que el viejo control de
- * duplicidad aparentara comprobar "hay sesion?" cuando solo comprobaba "sigue
- * activo?". La sesion de verdad vive en shared/services/session.service.js.
- */
 async function getUserProfileAndProcesses(userId) {
   const userResult = await pool.query(
     `SELECT 
@@ -223,9 +204,6 @@ async function getUserProfileAndProcesses(userId) {
   }
 
   const processesResult = await pool.query(
-    // Antes esta consulta no filtraba can_view: la sesion listaba procesos que el
-    // usuario no puede ver. Tampoco comprobaba u.is_active, aunque eso ya lo cubre
-    // el corte de :106, que devuelve null antes de llegar aqui.
     `SELECT
       process_code,
       process_name,

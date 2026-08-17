@@ -83,10 +83,7 @@ async function getExecutionAccess(userId, executionId) {
 }
 
 async function getReviewPayload(executionId) {
-  // Aqui habia un try/catch que ante 42P01 caia a un UNION a mano sobre
-  // workflow_approvals y workflow_events. Sobra: la vista vive en el esquema del
-  // proceso y tiene GRANT al rol lector, asi que si no responde es un fallo real
-  // y debe propagarse, no taparse con una segunda consulta.
+  
   const result = await pool.query(
     `SELECT payload
        FROM material_revaluations.v_review_web
@@ -100,15 +97,7 @@ async function getReviewPayload(executionId) {
 }
 
 async function getPendingReviewRows(userId) {
-  // v_pending_web absorbe el CTE de payloads y los dos JOIN; el gate se queda
-  // aqui a proposito, para que el filtro por usuario sea visible en el router y
-  // no quede escondido dentro de una vista.
-  //
-  // Aqui habia un segundo camino (directQuery) al que se caia ante 42P01/42703/
-  // 42501. Se borro porque no devolvia lo mismo: aceptaba cualquier aprobacion
-  // con approval_type = 'PORTAL_REVIEW' o cuyo payload trajera
-  // productosRevaluados/revaluaciones, SIN exigir que el proceso fuera
-  // material_revaluation, asi que podia mostrar aprobaciones de otros procesos.
+  
   const result = await pool.query(
     `SELECT
       p.execution_id,
@@ -331,9 +320,6 @@ async function markApprovalResolved({
   return result.rowCount;
 }
 
-// sap_status vive separado de approval_status: la decision humana (APPROVED/REJECTED)
-// NUNCA se toca al cambiar el estado de la escritura SAP. Guarda opcional por estado
-// (onlyFromProcessing) para no degradar un resultado ya terminal.
 async function setRevaluationSapStatus({
   approvalId,
   executionId,
@@ -385,13 +371,6 @@ async function setRevaluationSapStatus({
   }
 }
 
-// La revaluacion se reserva (approval_status=APPROVED) ANTES de llamar a n8n. Si el
-// envio falla o el resultado es incierto NO se reabre a PENDING: eso permitiria un
-// segundo POST que duplicaria el documento en SAP (no hay idempotency key ni recovery
-// aun). Se marca sap_status y la aprobacion queda APPROVED; como reservar exige
-// approval_status='PENDING', el endpoint ya no puede repetir el POST automaticamente.
-//   - skipped (webhook no configurado, no se envio) -> RETRYABLE
-//   - timeout / error (pudo haber llegado a SAP)     -> UNKNOWN  (requiere revision manual)
 async function failWithSapUncertain(
   req,
   res,
@@ -547,9 +526,6 @@ async function handleApproveReview(req, res) {
       });
     }
 
-    // Defensivo: si algun dia n8n respondiera SINCRONAMENTE con el contrato
-    // estructurado, se respeta aqui. Hoy el workflow es onReceived, asi que este
-    // bloque no se activa (workflowResult.operation viene null).
     const op = workflowResult.operation;
     if (op && op.status) {
       if (op.status === "SUCCEEDED") {
@@ -581,11 +557,6 @@ async function handleApproveReview(req, res) {
       });
     }
 
-    // Caso real (onReceived): n8n confirmo RECEPCION (200), no el resultado SAP. La
-    // operacion queda en PROCESSING (fijado en la reserva); el estado terminal
-    // (SUCCEEDED/FAILED/UNKNOWN, con DocEntry si existe) lo fija el callback
-    // /material-revaluations/notify. No se marca SUCCEEDED aqui para no enmascarar
-    // un fallo posterior de SAP (SUCCEEDED es pegajoso).
     await logActivity(req, {
       action: "revaluation.sent",
       entityType: "material_revaluation",
@@ -783,11 +754,7 @@ router.post(
         receivedAt: new Date().toISOString(),
       });
 
-      // Persistencia idempotente del estado SAP. Solo si el callback trae `status` y
-      // una referencia; si no (callback legacy), solo difunde SSE (compat hacia atras).
-      // SUCCEEDED es PEGAJOSO: nunca lo degrada un FAILED/UNKNOWN posterior ni un
-      // callback duplicado. UNKNOWN solo desde PROCESSING. Referencias (columnas old)
-      // se evaluan sobre el valor previo a este UPDATE.
+     
       let updated = 0;
       if (status && (approvalId || executionId)) {
         const setClause = `SET sap_status = CASE

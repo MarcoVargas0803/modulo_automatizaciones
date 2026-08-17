@@ -1,22 +1,3 @@
-// Catalogo SCAC de Sinay, con espejo en base y forma normalizada.
-//
-// Vivia dentro de international-purchases.routes.js, con el cache en variables
-// de modulo. Se extrajo porque el router publico —el formulario del forwarder—
-// necesita el mismo catalogo: si cada router tuviera su copia, tendrian caches
-// independientes y se harian el doble de llamadas a una API de pago.
-//
-// FORMA NORMALIZADA. Antes este archivo devolvia la respuesta CRUDA de Sinay y
-// el frontend adivinaba la forma con `opt.scac || opt.code || opt.id` y
-// `opt.name || opt.description`. Ninguna de esas claves existe: la respuesta
-// real trae `{ name, active, activeTypes, maintenance, scacCodes, prefixes }`,
-// con scacCodes como ARREGLO. La traduccion se hace UNA vez, aqui, y todo lo que
-// sale de este modulo es `{ scac, name, supportsBl, maintenance }`.
-//
-// CADENA DE RESPALDO. cache en memoria (24 h) -> Sinay (y se persiste) -> tabla
-// international_purchases.scac_catalog. El ultimo eslabon es lo que permite
-// validar el SCAC en las escrituras sin que una caida de Sinay bloquee el alta
-// de embarques. Ver el encabezado de scripts/schema-international-purchases-scac-catalog.sql.
-
 const env = require("../../../shared/config/env");
 const pool = require("../../../shared/db/pool");
 const { buildErrorResponse } = require("../../../shared/utils/errorResponse");
@@ -37,10 +18,6 @@ class ScacCatalogError extends Error {
   }
 }
 
-// La respuesta real viene envuelta en `sealines` (verificado contra la API el
-// 09/08/2026). Se aceptan tambien el arreglo suelto y `data` por si cambia el
-// envoltorio; lo que no sea arreglo se trata como catalogo vacio, no se deja
-// pasar en crudo, porque aguas abajo ya se asume la forma normalizada.
 function unwrapSinayPayload(json) {
   if (Array.isArray(json)) return json;
   if (Array.isArray(json?.sealines)) return json.sealines;
@@ -85,9 +62,6 @@ function expandSealine(raw) {
     }));
 }
 
-// Se persiste con UPSERT y NUNCA se borra lo que Sinay dejo de listar: un SCAC
-// retirado del catalogo sigue siendo valido para los embarques historicos que ya
-// lo usan, y borrarlo haria fallar la edicion de esas filas.
 async function persistCatalog(entries) {
   if (entries.length === 0) return;
 

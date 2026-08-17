@@ -1,13 +1,4 @@
 // Helpers de limpieza y normalizacion de los campos de un embarque.
-//
-// Vivian dentro de international-purchases.routes.js. Se mueven aqui porque el
-// router publico —el que usa el forwarder sin sesion— necesita exactamente las
-// mismas reglas: si se copiaran, el alta externa y la interna podrian divergir
-// en como recortan un espacio o como pasan a mayusculas una referencia, y esa
-// divergencia solo se notaria al quedar dos filas que deberian ser la misma.
-//
-// No suben a shared/ a proposito: solo los usa este modulo (ver la regla unica
-// de decision en .claude/conventions/architecture.md).
 
 const MAX_CUSTOM_FIELDS = 20;
 

@@ -63,10 +63,6 @@ function parseInviteId(value) {
   return text && UUID_REGEX.test(text) ? text : null;
 }
 
-// Emite el enlace e intenta enviarlo por correo. El envio va DESPUES del COMMIT
-// a proposito: si n8n esta caido, el enlace ya existe y el operador puede
-// copiarlo a mano. Al reves —enviar y luego guardar— se podria mandar un correo
-// con un enlace que no llego a existir.
 router.post(
   "/international-purchases/invites",
   ...writeGuard,

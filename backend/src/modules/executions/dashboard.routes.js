@@ -11,23 +11,12 @@ const {
 
 const router = express.Router();
 
-// Estados que la vista v_execution_dashboard_web traduce a español. El CASE ya
-// mapea los estados de aprobación de payments/material_revaluation (APPROVED,
-// REJECTED, RECHAZADO → EXITOSA/ERROR; PENDIENTE → EN PROCESO), así que lo que
-// caiga aquí es una anomalía real y no una categoría de negocio esperada —hoy,
-// ejecuciones de payments con status='STARTED' que ya tienen completed_at,
-// nunca actualizadas a SUCCESS/ERROR—, y se contabiliza aparte en vez de
-// desaparecer entre total_executions y los cuatro contadores.
 const KNOWN_STATUSES = "('EXITOSA','ERROR','EN PROCESO','INCOMPLETA')";
 
 const DEFAULT_RANGE_DAYS = 30;
 const MAX_RANGE_DAYS = 180;
 const TOP_ERRORS_LIMIT = 10;
 
-// created_at_mx ya viene convertido a America/Mexico_City por la vista y es un
-// timestamp SIN zona. Por eso el "hoy" del rango por defecto se calcula igual y
-// nunca con CURRENT_DATE: el pool no fija el TimeZone de la sesión de pg, así
-// que CURRENT_DATE cambiaría de día según el servidor.
 const RANGE_CTE = `
   rango AS (
     SELECT

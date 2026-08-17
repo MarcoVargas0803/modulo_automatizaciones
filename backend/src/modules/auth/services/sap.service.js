@@ -2,13 +2,6 @@ const https = require("https");
 
 const env = require("../../../shared/config/env");
 
-// Cliente minimo del Service Layer de SAP B1 solo para VERIFICAR credenciales en
-// el login. No mantiene sesion de SAP: hace Login, y si entra cierra con Logout
-// (best-effort) para no agotar las sesiones concurrentes de la licencia.
-//
-// Usa el modulo https nativo, no fetch, porque el cert del Service Layer es
-// autofirmado (192.168.x en LAN) y rejectUnauthorized:false se pasa directo aqui
-// sin depender de un Agent de undici. La contrasena NUNCA se registra en log.
 function sapRequest(pathName, { method = "POST", body, cookie } = {}) {
   return new Promise((resolve, reject) => {
     const base = env.sap.serviceLayerUrl.replace(/\/$/, "");
@@ -27,8 +20,6 @@ function sapRequest(pathName, { method = "POST", body, cookie } = {}) {
       url,
       {
         method,
-        // Cert autofirmado del Service Layer en la LAN: sin verificacion de
-        // identidad de SAP. Riesgo MITM asumido dentro de la red interna.
         rejectUnauthorized: false,
         headers,
         timeout: env.sap.loginTimeoutMs,

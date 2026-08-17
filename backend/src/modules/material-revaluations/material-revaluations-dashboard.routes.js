@@ -14,17 +14,6 @@ const guard = [requireAuth, requireProcess(PROCESS_CODE)];
 // por eso se queda aquí y no en la vista.
 const REVIEWER_LIMIT = 5;
 
-// KPIs del proceso de revaluación de material.
-//
-// Los tres agregados viven en vistas del esquema material_revaluations y se apoyan
-// a su vez en v_execution_approvals_web, que ya resuelve display_approval_status
-// (APROBADO / RECHAZADO / PENDIENTE) y response_duration_ms. Lo accionable es
-// pendientes_mas_24h: una revaluación esperando aprobación bloquea inventario.
-//
-// El umbral de 24 h y el filtro por process_code están ahora en el DDL de las
-// vistas; la constante STALE_APPROVAL_HOURS se borró de aquí para no dejar dos
-// fuentes de verdad. El detalle del AT TIME ZONE explícito —obligatorio porque
-// requested_at_mx no lleva zona y now() sí— viajó con ella.
 router.get(
   "/material-revaluations/dashboard-summary",
   ...guard,
@@ -64,12 +53,7 @@ router.get(
   },
 );
 
-// Analítica financiera para la vista de auditoría: costo de flete prorrateado
-// (costoFlete) en las revaluaciones completadas (status SUCCESS). El dato vive en
-// el payload JSONB de audit.workflow_events; se toma un costoFlete por ejecución,
-// priorizando el evento que también trae folio_flete. Los productos revaluados no
-// se persisten como arreglo (solo su conteo), así que aquí no hay desglose por
-// producto: eso queda para cuando el workflow los guarde.
+
 router.get(
   "/material-revaluations/audit-financials",
   ...guard,

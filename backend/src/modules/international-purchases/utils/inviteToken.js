@@ -1,14 +1,5 @@
 // Emision y verificacion de los enlaces permanentes que se entregan a los
 // forwarders para que registren embarques sin cuenta en el sistema.
-//
-// POR QUE NO ES UN JWT. El enlace de revision de pagos usa JWT y por eso NO SE
-// PUEDE REVOCAR: mientras no caduque, quien tenga la cadena entra. Aqui el
-// enlace es permanente por diseno, asi que un secreto irrevocable seria mucho
-// peor. Un token opaco guardado en la base se revoca cambiando una fila.
-//
-// QUE SE GUARDA. Solo el SHA-256 del token, nunca el token. Si se filtra un
-// respaldo de la base, nadie obtiene acceso de escritura. El token en claro
-// existe una sola vez: en la respuesta que ve el operador al emitirlo.
 
 const crypto = require("crypto");
 const pool = require("../../../shared/db/pool");

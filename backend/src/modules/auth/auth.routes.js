@@ -108,11 +108,6 @@ router.get("/auth/me", requireAuth, async (req, res) => {
 });
 
 router.post("/auth/logout", requireAuth, requireCsrf, async (req, res) => {
-  // Revocar ANTES de limpiar las cookies. Hasta ahora el logout solo borraba la
-  // cookie del navegador que llamaba: el token seguia siendo valido hasta su exp,
-  // asi que una copia del mismo token seguia entrando. Best-effort a proposito —
-  // si la revocacion falla, el usuario debe salir igualmente de este navegador—,
-  // pero se registra, porque un fallo aqui SI deja una sesion viva.
   try {
     await revokeSessionById(req.user.userId, req.user.sessionId, "logout");
   } catch (error) {

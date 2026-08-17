@@ -238,9 +238,6 @@ router.put("/admin/users/:id", ...writeGuard, async (req, res) => {
       [userId, displayName, email, targetActive],
     );
 
-    // Desactivar a alguien tiene que echarlo AHORA. Sin esto, su token seguia
-    // siendo valido hasta 60 s por la cache del middleware —y la UI ya decia que
-    // estaba desactivado—, que era una trampa documentada del proyecto.
     if (previous.is_active && !targetActive) {
       await revokeUserSessions(pool, userId, "user_deactivated");
     }
@@ -324,9 +321,6 @@ router.post("/admin/users/:id/password", ...writeGuard, async (req, res) => {
   }
 });
 
-// Valvula de escape operativa: cierra la sesion de un usuario sin tocar su
-// contrasena ni desactivarlo. Cubre el caso de la sesion olvidada en un equipo
-// ajeno, para el que la alternativa era esperar al arrendamiento por inactividad.
 router.post("/admin/users/:id/logout", ...writeGuard, async (req, res) => {
   const userId = parseUserId(req.params.id);
 
@@ -571,8 +565,7 @@ router.get("/admin/activity", ...guard, async (req, res) => {
   }
 });
 
-// Mismos filtros que la vista, pero hasta 5000 filas: es para analisis fuera de linea,
-// no para la pantalla.
+
 router.get("/admin/activity/export.csv", ...guard, async (req, res) => {
   const { values, filters } = buildActivityFilters(req.query);
   values.push(5000);
@@ -616,28 +609,7 @@ router.get("/admin/health", ...guard, async (req, res) => {
     database.serverTime = result.rows[0].server_time;
     database.pool = { total: pool.totalCount, idle: pool.idleCount, waiting: pool.waitingCount };
   } catch (error) {
-    // Este catch hacia lo contrario de lo correcto en los dos canales: se tragaba
-    // el error en el servidor y lo copiaba entero a la respuesta HTTP. Ahora el
-    // detalle va SOLO al log.
-    //
-    // OJO con el alcance, verificado en dev el 07/08/2026 y no supuesto: una caida
-    // TOTAL de la base nunca llega hasta aqui. requireProcess consulta
-    // v_user_process_access_effective en cada request y no tiene cache, asi que
-    // muere primero con 500 "Error al validar el acceso al modulo" y este handler
-    // no se ejecuta. (requireAuth si tiene cache de 60 s, pero el gate de proceso
-    // no.)
-    //
-    // Lo que SI llegaba aqui es el fallo PARCIAL: la vista del gate responde pero
-    // las consultas de este handler no -- un GRANT que falta sobre users,
-    // processes o activity_log (tres tablas que el gate no toca), un lock, un
-    // statement timeout, el pool agotado. En esos casos error.message lleva
-    // nombres de objetos, roles y detalles de bloqueo: menos grave que una IP
-    // interna, pero sigue sin ser algo que deba pintarse en un navegador, porque
-    // la respuesta acaba en la pestana Network, en la cache y en un HAR pegado en
-    // un ticket.
-    //
-    // Quitar `message` no cuesta nada en pantalla: Administration.jsx nunca lo
-    // leyo. Con ok:false la tarjeta de Salud pinta el badge "Sin conexion" y ya.
+    
     console.error("[admin/health] Fallo la comprobacion de la base de datos:", error);
   }
 

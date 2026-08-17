@@ -26,9 +26,6 @@ const {
   sanitizeCustomFields,
   UUID_REGEX,
 } = require("./utils/shipmentFields");
-// El cache de 24 h del catalogo SCAC se fue con el: dos routers con su propia
-// copia del cache harian el doble de llamadas a una API de pago. El handler del
-// endpoint tambien vive alli, porque el router publico expone el mismo catalogo.
 const {
   scacValidationError,
   scacCatalogHandler,
@@ -47,23 +44,7 @@ const ALLOWED_SHIPMENT_STATUSES = [
 
 const ALLOWED_PROVIDER_TYPES = ["NAVIERA", "FORWARDER"];
 
-// Espeja el CHECK shipments_source_type_check de la base, verificado contra la
-// base de desarrollo el 05/08/2026:
-//   CHECK (source_type = ANY (ARRAY['EMAIL','PORTAL','N8N','MANUAL']))
-//
-// Antes decia ["PORTAL","N8N","IMPORT","SYSTEM"] y divergia en los dos sentidos:
-// 'EMAIL' y 'MANUAL' son valores legales -- 'EMAIL' es ademas el DEFAULT de la
-// columna-- pero el filtro los rechazaba con 400; y 'IMPORT'/'SYSTEM' pasaban el
-// filtro sin poder existir jamas en la tabla. No se noto porque todas las filas
-// de hoy son 'PORTAL'.
-//
-// Al tocar esta lista, tocar tambien el CHECK: son la misma regla en dos sitios.
 const ALLOWED_SOURCE_TYPES = ["EMAIL", "PORTAL", "N8N", "MANUAL"];
-
-// ALLOWED_REFERENCE_TYPES = ["BL","BK","CT"] vivia aqui y se borro: no se usaba
-// en ninguna parte y los tres valores eran imposibles. La base impone
-//   CHECK (tracking_reference_type IS NOT NULL AND tracking_reference_type = 'MBL')
-// asi que la referencia solo puede ser 'MBL'.
 
 function validateRequiredFields({
   trackingKey,
@@ -164,33 +145,10 @@ function validateShipmentFilters({
   return errors;
 }
 
-// Cadenas de middlewares canonicas del modulo, con el patron de arrays de
-// admin.routes.js y de international-purchases-dashboard.routes.js.
-//
-// Antes este archivo tenia su propia copia del SQL de requireProcess dentro de
-// getInternationalPurchasesModuleAccess(), llamada a mano al principio de cada
-// handler. Era equivalente -- cruzaba user_process_access con users y processes
-// exigiendo las tres activas-- pero duplicada: cualquier cambio en la regla de
-// acceso obligaba a tocar dos sitios. El resultado del gate queda ahora en
-// req.processAccess, con las columnas tal cual salen de la base (can_view,
-// can_export, role).
 const guard = [requireAuth, requireProcess(PROCESS_CODE, { denyAuditorWrite: true })];
-// El limiter faltaba aqui: las cuatro escrituras de embarques (POST, PUT, DELETE
-// y refresh-tracking) eran las unicas del modulo sin cuota, mientras que las de
-// invitaciones si la tenian. Es el mismo limiter, a proposito: la cuota es por
-// IP y por modulo, no por endpoint.
+
 const writeGuard = [...guard, requireCsrf, internationalPurchasesActionLimiter];
 
-/**
- * NOTA — updated_at en embarques:
- * El portal NO escribe updated_at en INSERT ni en UPDATE (PUT).
- * El campo updated_at de international_purchases.shipments es gestionado
- * exclusivamente por el flujo de n8n, que lo actualiza con la fecha real
- * del último cambio de tracking recibido desde la API externa.
- * El trigger trg_shipments_update_metadata existe en la BD pero será
- * deshabilitado/eliminado para que n8n pueda escribir el valor correcto.
- * Desde el backend del portal sólo se lee updated_at (RETURNING / SELECT).
- */
 router.post(
   "/international-purchases/shipments",
   ...writeGuard,
@@ -226,9 +184,6 @@ router.post(
         });
       }
 
-      // El catalogo se comprueba aparte porque la consulta es asincrona y
-      // validateRequiredFields no lo es. Va DESPUES del corte de arriba: sin
-      // scac ya salio el error de obligatorio y no hay nada que buscar.
       const scacError = await scacValidationError(scac);
 
       if (scacError) {
@@ -239,19 +194,6 @@ router.post(
         });
       }
 
-      // La columna espejo `bl` ya no se lee NI se escribe desde el portal. Se
-      // retiro del SELECT del listado, del filtro de busqueda —era redundante, la
-      // busqueda ya cruza tracking_key—, de los RETURNING y ahora tambien de este
-      // INSERT: el CASE `WHEN $2 = 'BL'` estaba muerto porque el CHECK
-      // shipments_tracking_reference_type_check obliga a que
-      // tracking_reference_type sea exactamente 'MBL', asi que esa rama nunca se
-      // cumplia y todo embarque nacia con bl = NULL.
-      //
-      // Este es el PASO A de la retirada: el codigo deja de nombrar la columna.
-      // El PASO B —el DROP COLUMN— vive en el Bloque 4 de
-      // backend/src/scripts/schema-international-purchases-invites.sql y NO se
-      // puede ejecutar hasta que este cambio este desplegado: con el codigo
-      // anterior, cada alta y cada edicion fallarian con 42703.
       const result = await pool.query(
         `
         INSERT INTO international_purchases.shipments (
@@ -448,9 +390,6 @@ router.post(
         });
       }
 
-      // Solo se audita el refresco que realmente arranco: las dos salidas de
-      // arriba (503 sin webhook configurado, 502 si n8n rechaza) no llegan aqui,
-      // asi que el log no registra intentos fallidos como trabajo hecho.
       await logActivity(req, {
         action: "international_purchases.tracking_refreshed",
         entityType: "shipment",
@@ -817,9 +756,6 @@ router.put(
       client = await pool.connect();
       await client.query("BEGIN");
 
-      // Se bloquea la fila y se lee la referencia ANTERIOR antes de escribirla: es lo
-      // que permite distinguir una correccion de MBL de una edicion cualquiera, y
-      // evita que dos ediciones simultaneas se pisen.
       const actual = await client.query(
         `SELECT tracking_key
            FROM international_purchases.shipments
@@ -844,13 +780,6 @@ router.put(
         UPDATE international_purchases.shipments
         SET
           tracking_key = $12,
-
-          -- Aqui se anulaba la columna espejo bl al corregir la referencia. Ya no
-          -- se nombra (Paso A, ver el comentario del INSERT). Consecuencia asumida:
-          -- entre este despliegue y el DROP COLUMN del Paso B, corregir el MBL de
-          -- una de las 3 filas heredadas que aun tienen bl deja ese espejo
-          -- apuntando a la clave vieja. Es inerte --nadie lee la columna, ni el
-          -- portal ni el flujo de tracking de n8n-- y el Paso B se la lleva entera.
           tracking_provider_type = $1,
           tracking_provider_name = $2,
           scac = $3,
@@ -1042,9 +971,6 @@ router.delete(
 
       const borrado = result.rows[0];
 
-      // Despues del COMMIT, nunca dentro de la transaccion: logActivity usa el
-      // pool y no este client, asi que meterlo antes lo dejaria fuera del
-      // rollback igualmente, pero registrando un borrado que pudo no ocurrir.
       await logActivity(req, {
         action: "international_purchases.shipment_deleted",
         entityType: "shipment",

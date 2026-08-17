@@ -38,6 +38,11 @@ n8n/
 # Análisis local del código
 graphify-out/
 
+# Override de puertos del entorno de desarrollo. Es configuración de cada
+# máquina (convivir con el entorno dev de modulo-reportes, que ocupa 3001,
+# 5173 y 5432), no contrato de equipo.
+docker-compose.dev.local.yml
+
 # frontend/vite.config.dev.js SÍ se versiona: docker-compose.dev.yml lo invoca
 # con `--config vite.config.dev.js`, así que ignorarlo dejaba el entorno de
 # desarrollo roto en un clon limpio hasta que cada persona lo recreaba a mano.

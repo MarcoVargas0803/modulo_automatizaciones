@@ -6,24 +6,9 @@
 // escribe en la base sin sesion, asi que conviene tener claro por que no es un
 // agujero:
 //
-//   * La credencial es el token del enlace, en el header
-//     X-Shipment-Invite-Token. Sin el, ninguna ruta de aqui responde.
-//   * NO hay CSRF que valer: CSRF explota la cookie que el navegador adjunta
-//     sola. Aqui no hay cookie —la credencial viaja en un header que un
-//     formulario de otro sitio no puede fijar sin pasar por CORS— asi que el
-//     ataque no aplica. Anadir requireCsrf seria imposible ademas: el forwarder
-//     no tiene sesion en la que sembrar el doble token.
-//   * El INSERT esta endurecido: el forwarder NO elige source_type,
-//     review_status, tracking_enabled ni portal_created_by. Se fuerzan en el
-//     servidor. Los campos que si controla pasan por los mismos normalizadores
-//     que el alta interna.
-//   * Todo queda en activity_log. Como no hay tabla de borradores, ese log es
-//     el UNICO rastro de quien registro que y desde donde; logActivity funciona
-//     sin sesion (usa req.user?.userId || null y registra req.ip).
-//
-// El montaje de este router va ANTES que el de international-purchases.routes.js
-// en index.js. No por colision de rutas —todas cuelgan de /public/— sino para
-// que quede a la vista que existe un tramo sin sesion.
+// La credencial es el token del enlace, en el header
+// X-Shipment-Invite-Token. Sin el, ninguna ruta de aqui responde.
+
 
 const express = require("express");
 const pool = require("../../shared/db/pool");
