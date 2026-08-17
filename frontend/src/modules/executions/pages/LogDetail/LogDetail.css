@@ -1,0 +1,247 @@
+/* Sin max-width: mismo criterio que .dashboard-page y .logs-page, que ya son
+   fluidas. El tope fijo de 800px dejaba las 4 subtablas (Documentos, Eventos,
+   Transacciones, Aprobaciones) angostas y con hueco muerto a los lados en
+   pantallas anchas, aunque cada DataTable ya contiene su propio scroll. */
+.log-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.log-detail-card {
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+}
+
+.detail-card-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--color-surface-variant);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.detail-title {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.detail-subtitle {
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-label);
+  font-size: 14px;
+}
+
+.detail-body {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.detail-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+
+.metadata-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metadata-label {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+}
+
+.metadata-value {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-on-surface);
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.material-review-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.review-note {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+}
+
+.review-note-error {
+  color: var(--color-error);
+}
+
+.review-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-select-label {
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+}
+
+.review-select {
+  min-width: 140px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-elevated);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 8px 10px;
+}
+
+.review-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-elevated);
+}
+
+.review-summary > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.review-table-wrapper .data-table-container {
+  max-height: 420px;
+}
+
+.review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.review-send-status {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.review-send-status-loading {
+  background-color: var(--color-info-container);
+  color: var(--color-on-info-container);
+}
+
+.review-send-status-success {
+  background-color: var(--color-success-container);
+  color: var(--color-on-success-container);
+}
+
+.review-send-status-error {
+  background-color: var(--color-error-container);
+  color: var(--color-on-error-container);
+}
+
+.materials-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.materials-table th {
+  text-align: left;
+  font-family: var(--font-label);
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  border-bottom: 1px solid var(--color-outline-variant);
+  padding: 8px 0;
+  text-transform: uppercase;
+}
+
+.materials-table td {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-surface-variant);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.materials-table tr:last-child td {
+  border-bottom: none;
+}
+
+.notes-text {
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+  background-color: var(--color-surface);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-outline-variant);
+}
+
+.detail-footer {
+  padding: 24px 32px;
+  border-top: 1px solid var(--color-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-surface);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.footer-actions {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .detail-card-header, .detail-body, .detail-footer {
+    padding: 24px 16px;
+  }
+  .detail-footer {
+    flex-direction: column-reverse;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .footer-actions {
+    flex-direction: column;
+  }
+  .review-header,
+  .review-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .review-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .review-summary {
+    grid-template-columns: 1fr;
+  }
+}

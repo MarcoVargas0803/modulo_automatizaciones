@@ -1,0 +1,94 @@
+/* Pagina publica del forwarder.
+ *
+ * Solo define el marco: el formulario de dentro reutiliza las clases de
+ * ShipmentFormModal.css. Al no montarse dentro de DashboardLayout —va fuera de
+ * ProtectedRoute— necesita su propio fondo y centrado, que es lo unico que el
+ * layout habria aportado.
+ */
+
+.shipment-registration {
+  min-height: 100vh;
+  background: var(--color-background);
+  padding: var(--spacing-3) var(--spacing-2);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.shipment-registration-panel {
+  width: 100%;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  padding: var(--spacing-4);
+}
+
+.shipment-registration-header {
+  margin-bottom: var(--spacing-3);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.shipment-registration-kicker {
+  margin: 0 0 var(--spacing-0);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted-text);
+}
+
+.shipment-registration-header h1 {
+  margin: 0 0 var(--spacing-1);
+  font-family: var(--font-headline);
+  font-size: 1.5rem;
+  color: var(--color-on-surface);
+}
+
+.shipment-registration-intro {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+}
+
+.shipment-registration-errors {
+  margin: 0;
+  padding-left: var(--spacing-2);
+}
+
+.shipment-registration-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-1);
+  margin-top: var(--spacing-3);
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-divider);
+}
+
+.shipment-registration-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+}
+
+@media (max-width: 640px) {
+  .shipment-registration {
+    padding: var(--spacing-1);
+  }
+
+  .shipment-registration-panel {
+    padding: var(--spacing-2);
+  }
+
+  /* En movil los botones ocupan el ancho: el pulgar no acierta un boton
+     alineado a la derecha en una pantalla estrecha. */
+  .shipment-registration-actions {
+    flex-direction: column-reverse;
+  }
+
+  .shipment-registration-actions > * {
+    width: 100%;
+  }
+}

@@ -1,0 +1,366 @@
+/* Satoshi (Fontshare / Indian Type Foundry) — ver LICENSE.txt en assets/fonts.
+ * Auto-hospedada a propósito: el sistema se despliega en un servidor interno y
+ * un CDN externo deja la tipografía a merced de que la planta tenga internet.
+ * Se usa la fuente variable (eje wght 300-900): un solo archivo cubre todos los
+ * pesos reales del proyecto (400/500/600/700/800) y elimina el "faux bold" que
+ * el navegador sintetizaba cuando se pedía un peso no cargado. */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('./assets/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('./assets/fonts/Satoshi-VariableItalic.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ─── Paleta de Marca (Maderas Rivero) ─── */
+  --color-primary: #421e04;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #5c3317;
+  --color-on-primary-container: #d69b77;
+
+  --color-secondary: #8c4f00;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fd9923;
+  --color-on-secondary-container: #663800;
+
+  /* ─── Fondo y Superficies ─── */
+  --color-background: #fcf9f8;
+  --color-on-background: #1b1c1c;
+
+  /* Panel lateral: se mantiene oscuro en ambos temas */
+  --color-sidebar-bg: #421e04;
+
+  /* Skeletons (react-loading-skeleton) */
+  --skeleton-base: #e4e2e1;
+  --skeleton-shine: #f5f3f1;
+
+  --color-surface: #fcf9f8;
+  --color-surface-elevated: #ffffff;
+  --color-on-surface: #1b1c1c;
+  --color-surface-variant: #e4e2e1;
+  --color-on-surface-variant: #51443d;
+
+  /* ─── Bordes y Separadores ─── */
+  --color-outline: #84746c;
+  --color-outline-variant: #d6c3b9;
+  --color-divider: #e0d9d4;
+  --color-muted-text: #70635d;
+
+  /* ─── Error ─── */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #7f1d1d;
+
+  /* ─── Éxito (verde semántico) ─── */
+  --color-success: #166534;
+  --color-on-success: #ffffff;
+  --color-success-container: #dcfce7;
+  --color-on-success-container: #14532d;
+
+  /* ─── Advertencia (ámbar, en línea con la paleta de marca) ─── */
+  --color-warning: #92400e;
+  --color-on-warning: #ffffff;
+  --color-warning-container: #fef3c7;
+  --color-on-warning-container: #78350f;
+
+  /* ─── Info (azul oscuro neutro) ─── */
+  --color-info: #1e3a5f;
+  --color-on-info: #ffffff;
+  --color-info-container: #dbeafe;
+  --color-on-info-container: #1e3a5f;
+
+  /* ─── Atascado (violeta, distinto del naranja de marca y de --chart-3) ─── */
+  /* Token disponible para cuando un estado necesite distinguirse de "pendiente"
+     (warning). Hoy "atascada"/"incompleta" sigue mapeando a warning en
+     rule-decisions.md — cambiar esa tabla y sus consumidores (statusVariant.js,
+     Badge, DataCard) es una decisión aparte, no forma parte de agregar el token. */
+  --color-stuck: #6b21a8;
+  --color-on-stuck: #ffffff;
+  --color-stuck-container: #f3e8ff;
+  --color-on-stuck-container: #581c87;
+
+  /* ─── Series de gráfica (paleta categórica) ─── */
+  /* Solo para categorías SIN semántica de estado: navieras, campos de tracking.
+     Cuando la serie represente un estado (éxito, error, pendiente, en proceso)
+     va con los tokens semánticos de arriba, para que la gráfica y el Badge de la
+     tabla digan lo mismo con el mismo color. */
+  --chart-1: #8c4f00;
+  --chart-2: #1e5f74;
+  --chart-3: #7a3b8f;
+  --chart-4: #166534;
+  --chart-5: #b45309;
+  --chart-6: #475569;
+
+  /* ─── Tipografía ─── */
+  /* Familia única. Los tres tokens comparten familia a propósito: se conservan
+     por intención semántica (cuerpo / titular / etiqueta) y como punto de
+     extensión si algún día se quiere diferenciar titulares. */
+  --font-body: 'Satoshi', system-ui, sans-serif;
+  --font-headline: 'Satoshi', system-ui, sans-serif;
+  --font-label: 'Satoshi', system-ui, sans-serif;
+  /* Datos que deben alinearse en columna (folios, referencias, importes).
+     Stack del sistema: cero bytes que descargar y siempre disponible. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* ─── Espaciado (escala 4px base) ─── */
+  --spacing-0: 4px;
+  --spacing-1: 8px;
+  --spacing-2: 16px;
+  --spacing-3: 24px;
+  --spacing-4: 32px;
+  --spacing-5: 40px;
+  --spacing-6: 48px;
+  --spacing-7: 56px;
+  --spacing-8: 64px;
+
+  /* ─── Radios de borde ─── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ─── Sombras ─── */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  /* ─── Z-index Scale ─── */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 9000;
+  --z-toast: 9999;
+
+  /* ─── Transiciones estándar ─── */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Curva de aceleración del sistema. Estaba escrita a mano en cinco reglas de
+     DashboardLayout.css antes de existir como token. */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Tema oscuro (override de tokens) ─── */
+:root[data-theme="dark"] {
+  --color-primary: #e0a97e;
+  --color-on-primary: #3a1e0a;
+  --color-primary-container: #5c3317;
+  --color-on-primary-container: #f0c9ac;
+
+  --color-secondary: #f0a94a;
+  --color-on-secondary: #3a1e0a;
+  --color-secondary-container: #7a4a10;
+  --color-on-secondary-container: #ffd9a8;
+
+  --color-background: #17130f;
+  --color-on-background: #ece7e3;
+
+  --color-surface: #17130f;
+  --color-surface-elevated: #221d18;
+  --color-on-surface: #ece7e3;
+  --color-surface-variant: #322c26;
+  --color-on-surface-variant: #c9bdb3;
+
+  --color-sidebar-bg: #241d15;
+
+  --skeleton-base: #2c2620;
+  --skeleton-shine: #3a332c;
+
+  --color-outline: #8a7c72;
+  --color-outline-variant: #443c35;
+  --color-divider: #332d28;
+  --color-muted-text: #a99e95;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #3a0a08;
+  --color-error-container: #4e1c1c;
+  --color-on-error-container: #ffb4ab;
+
+  --color-success: #7ddba0;
+  --color-on-success: #06301a;
+  --color-success-container: #1e3a24;
+  --color-on-success-container: #a6f0bf;
+
+  --color-warning: #f5c675;
+  --color-on-warning: #3a2a08;
+  --color-warning-container: #3d2f12;
+  --color-on-warning-container: #f5d79a;
+
+  --color-info: #a9c7f0;
+  --color-on-info: #0a1a2f;
+  --color-info-container: #1e2a3f;
+  --color-on-info-container: #bcd4f5;
+
+  --color-stuck: #d8b4fe;
+  --color-on-stuck: #2e1065;
+  --color-stuck-container: #3b1560;
+  --color-on-stuck-container: #e9d5ff;
+
+  /* Series de gráfica aclaradas para mantener el contraste sobre superficie
+     oscura. Como el SVG las consume vía var(), el tema se resuelve solo. */
+  --chart-1: #f0a94a;
+  --chart-2: #6cc3d9;
+  --chart-3: #c79bd8;
+  --chart-4: #7ddba0;
+  --chart-5: #f5a35c;
+  --chart-6: #a3b1c2;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-modal: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-label);
+  cursor: pointer;
+}
+
+/* ─── Estado de recarga en segundo plano (atenúa sin desmontar) ─── */
+.is-refreshing {
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+/* ─── Aparición de contenido ────────────────────────────────────────────────
+   Solo opacidad, nunca desplazamiento: un `translate` en una rejilla densa de
+   KPIs o en una tabla se lee como salto de maquetación.
+
+   Regla de uso: anima quien cambia de estado, no quien acompaña. Lo que llega
+   junto con la página ya entra dentro del fundido del contenedor de ruta; si
+   además se anima por su cuenta, se apilan dos fundidos sobre lo mismo. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in var(--transition-base) var(--ease-standard) both;
+}
+
+/* Variante con retardo para placeholders de carga: `both` mantiene el fotograma
+   inicial durante la espera, así que el elemento es invisible los primeros
+   120 ms y una carga rápida no llega a mostrarlo. Evita el parpadeo del
+   esqueleto cuando el chunk ya está en caché. */
+.fade-in-delayed {
+  animation: fade-in var(--transition-base) var(--ease-standard) 120ms both;
+}
+
+/* Los componentes que traen el fundido de fábrica (DataTable, DataCard, Alert,
+   EmptyState, el panel de FilterBar) no llevan las clases de arriba, así que una
+   regla que solo las nombrara no los cubriría. El selector universal alcanza
+   además a Toast, Hint, Modal y al brillo del skeleton, que hasta ahora seguían
+   moviéndose con la preferencia activada.
+
+   Solo se anulan animaciones, no transiciones: una transición de color o de
+   opacidad al pasar el cursor no es el movimiento del que protege esta
+   preferencia, y las que sí lo son —el colapso del sidebar, el zoom del
+   ImageViewer— ya tienen su propia regla. */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+}
+
+/* ─── Utilidades de texto globales ─── */
+.label-text {
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+
+.data-text {
+  font-family: var(--font-label);
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.muted-text {
+  color: var(--color-muted-text);
+  font-size: 14px;
+}
+
+/* ─── Enlace de Acción Unificado (.action-link) ─── */
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-primary);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.action-link:hover {
+  text-decoration: underline;
+  color: var(--color-secondary);
+}
+
+/* ─── Utilidades de Truncamiento ─── */
+.truncate-single {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+

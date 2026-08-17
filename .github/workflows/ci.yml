@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+  backend:
+    name: Backend (arranque + health)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - run: npm run lint
+        working-directory: backend
+
+      # El pool de pg no conecta hasta la primera consulta y /api/health no consulta,
+      # asi que el humo no necesita base de datos: valida que todas las rutas cargan,
+      # que la validacion de entorno pasa y que el servidor responde.
+      - name: Humo
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_NAME: ci
+          DB_USER: ci
+          DB_PASSWORD: ci
+          JWT_SECRET: secreto-de-ci-para-firmar-sesiones
+          FRONTEND_ORIGINS: http://localhost:5173
+        run: |
+          node -e "
+            const app = require('./src/app');
+            const server = app.listen(3001, async () => {
+              const res = await fetch('http://localhost:3001/api/health');
+              const json = await res.json();
+              console.log(res.status, JSON.stringify(json));
+              process.exitCode = res.ok && json.success ? 0 : 1;
+              server.close();
+            });
+          "

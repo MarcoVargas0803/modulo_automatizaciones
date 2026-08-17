@@ -1,0 +1,141 @@
+.shipment-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--color-on-surface-variant);
+}
+
+.form-field span {
+  font-weight: 600;
+}
+
+/* Nota bajo un campo: explica algo del valor elegido sin bloquear la captura.
+   Necesita su propia clase porque `.form-field span` fuerza font-weight 600 y
+   una nota en negrita compite con la etiqueta del campo. */
+.form-field .field-note {
+  font-weight: 400;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--color-muted-text);
+}
+
+/* La naviera elegida no admite rastreo por MBL, o está en mantenimiento en la
+   API de Sinay. El embarque se puede registrar igual: es un aviso, no un error,
+   y por eso usa la familia warning y no la de error. */
+.form-field .field-note.warning {
+  color: var(--color-on-warning-container);
+  background: var(--color-warning-container);
+  padding: var(--spacing-0) var(--spacing-1);
+  border-radius: var(--radius-sm);
+}
+
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.95rem;
+  background: var(--color-surface-elevated);
+  color: var(--color-on-surface);
+}
+
+.form-field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.readonly-value {
+  padding: 0.65rem 0.75rem;
+  border: 1px dashed var(--color-outline-variant);
+  border-radius: 0.65rem;
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+  font-size: 0.95rem;
+}
+
+.custom-fields-section {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.custom-fields-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.form-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+}
+
+.custom-fields-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-text);
+}
+
+.custom-fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.custom-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.custom-field-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-elevated);
+  color: var(--color-muted-text);
+  cursor: pointer;
+}
+
+.custom-field-remove:hover {
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+@media (max-width: 1100px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

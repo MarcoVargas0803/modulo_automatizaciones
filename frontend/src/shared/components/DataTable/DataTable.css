@@ -1,0 +1,189 @@
+.data-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-elevated);
+  box-shadow: var(--shadow-1);
+  -webkit-overflow-scrolling: touch;
+  /* Sombra de scroll horizontal: sin JS, sin marcar overflow con un booleano
+     — los dos "cover" (background-attachment: local) se desplazan con el
+     contenido y tapan la sombra de su lado en cuanto ya no hay más que
+     scrollear; los dos radial-gradient (background-attachment: scroll) son
+     la sombra en sí, fija respecto al contenedor. Truco clásico ("scroll
+     shadows"), no una librería. El color de sombra es literal a propósito:
+     --shadow-1/2/modal ya son rgba(0,0,0,X) por dentro, no hay token de
+     "tinte de sombra" que extraer de un box-shadow shorthand. */
+  background-image:
+    linear-gradient(to right, var(--color-surface-elevated) 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(to left, var(--color-surface-elevated) 30%, rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-attachment: local, local, scroll, scroll;
+  /* La tabla con datos sustituye a la tabla en carga (dos ramas de return en
+     DataTable.jsx), así que este fundido cubre el relevo. Se repite al paginar,
+     porque `isLoading` vuelve a true: es deliberado, confirma que la página
+     cambió. Para un refresco que no deba parpadear está `.is-refreshing`, que
+     atenúa sin desmontar. */
+  animation: fade-in var(--transition-base) var(--ease-standard) both;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+/* ─── Encabezados ─── */
+/* Antes era un bloque sólido --color-primary: alto contraste, pesado y
+   anticuado junto a las superficies claras del resto de la página. Un borde
+   inferior sostiene la separación con menos peso visual. */
+.data-table-th {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-on-surface-variant);
+  border-bottom: 1px solid var(--color-outline-variant);
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 12px 16px;
+  white-space: nowrap;
+}
+
+/* thead.is-sticky (prop stickyHeader): ancla la cabecera al techo de
+   .data-table-container en vez de desplazarse con el contenido. El fondo ya
+   sólido de .data-table-th es lo que evita que el texto de las filas se vea
+   "a través" al pasar por debajo. */
+.data-table-thead.is-sticky th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-table-th--select,
+.data-table-td--select {
+  width: 1%;
+  padding-right: 4px;
+  white-space: nowrap;
+}
+
+.data-table-th--select input,
+.data-table-td--select input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ─── Densidad ─── */
+/* data-density="compact" en el contenedor, no una prop por celda: una tabla
+   larga (partidas, ejecuciones) gana más scroll útil con menos aire por fila.
+   Comfortable (default) no cambia nada respecto al padding de siempre. */
+.data-table-container[data-density="compact"] .data-table-td {
+  padding: 6px 16px;
+}
+
+.data-table-container[data-density="compact"] .data-table-th {
+  padding: 8px 16px;
+}
+
+/* ─── Filas de grupo ─── */
+.data-table-row--group {
+  background-color: var(--color-surface-variant);
+}
+
+.data-table-row--group:hover {
+  background-color: var(--color-surface-variant);
+}
+
+.data-table-group-cell {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--color-on-surface);
+  white-space: normal;
+}
+
+.data-table-row.is-selected {
+  background-color: var(--color-info-container);
+}
+
+/* Para el `tableCaption`: visible a lectores de pantalla, oculto en pantalla.
+   Mismo patrón que ya usan SupplierAccounts.css/PaymentsReconciliation.css. */
+.data-table-container .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Encabezados ordenables ─── */
+.data-table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+}
+
+.data-table-sort-idle {
+  opacity: 0.5;
+}
+
+.data-table-sort:hover .data-table-sort-idle {
+  opacity: 0.85;
+}
+
+/* ─── Filas ─── */
+.data-table-row {
+  transition: background-color var(--transition-fast);
+}
+
+.data-table-row:hover {
+  background-color: var(--color-surface-variant);
+}
+
+/* Filas clickeables */
+.data-table-row--clickable {
+  cursor: pointer;
+}
+
+/* ─── Celdas ─── */
+.data-table-td {
+  padding: 12px 16px;
+  font-family: var(--font-label);
+  font-size: 14px;
+  color: var(--color-on-surface);
+  border-bottom: 1px solid var(--color-divider);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table-row:last-child .data-table-td {
+  border-bottom: none;
+}
+
+/* ─── Estado vacío ─── */
+.data-table-empty {
+  text-align: center;
+  padding: var(--spacing-5) var(--spacing-2);
+  color: var(--color-muted-text);
+  font-style: italic;
+  white-space: normal;
+}

@@ -1,0 +1,44 @@
+services:
+  modulo_automatizaciones_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Nombre propio a proposito: si este portal convive en el servidor con el
+    # despliegue de modulo-reportes, un container_name repetido impide levantar
+    # el segundo. El PUERTO del host sigue siendo el 3001 y ESE si choca:
+    # cambiar el lado izquierdo del mapeo (p.ej. "3002:3001") antes de levantar
+    # los dos a la vez, y ajustar el proxy que tenga delante.
+    container_name: modulo_automatizaciones_app
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    # Precedencia en Compose: environment > env_file > ENV del Dockerfile.
+    # NODE_ENV se fija AQUI, y no solo en Dockerfile:15, porque env_file anula el
+    # ENV de la imagen: bastaba copiar el backend/.env de desarrollo al servidor
+    # --mismo nombre de archivo, gitignorado, sin diff que lo delatara-- para que
+    # produccion arrancara en modo development y empezara a mandar el detalle de
+    # cada error al navegador. De este valor cuelgan hsts, el formato de morgan, el
+    # recorte de la respuesta de n8n y el detalle de error en las respuestas.
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    networks:
+      - n8n_net
+    # El driver json-file por defecto no tiene limite de tamano. Desde que
+    # buildErrorResponse registra cada error, un endpoint roto escribe una traza
+    # completa POR PETICION: el 500 del 07/08/2026 en el listado de embarques habria
+    # generado trazas de forma continua contra el disco del host.
+    # 3 archivos x 10 MB = 30 MB por contenedor, que son los mas recientes -- lo que
+    # se necesita para diagnosticar un incidente en curso.
+    # OJO: solo se aplica al RECREAR el contenedor (up -d --build), no con restart.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  n8n_net:
+    external: true
+    name: n8n_n8n_net

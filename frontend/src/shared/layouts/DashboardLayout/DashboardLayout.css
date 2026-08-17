@@ -1,0 +1,341 @@
+.dashboard-layout {
+  /* Ancho de la barra lateral.
+
+     Es un valor fijo a propósito. Antes era `fit-content`, y entonces el ancho lo
+     decidía la fila más larga del árbol: al desplegar una rama la barra crecía.
+     Con un ancho fijo el borde deja de moverse.
+
+     260px sigue cubriendo la fila más ancha de hoy («Conciliación bancaria»,
+     nivel 2) sin recortarla, ajustado el padding de `.tree-item` (Parte X del
+     documento de diseño). Si aparece una etiqueta más larga, `.tree-item__label`
+     ya la recorta con elipsis; `TreeItem` sí emite `title` con el texto
+     completo (TreeView.jsx), así que un recorte no deja el texto ilegible. */
+  --sidebar-width: 216px;
+
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  /* Acotada a la ventana, igual que .main-content. Sin esto, un menú más alto
+     que la pantalla estira .dashboard-layout —que usa min-height— y aparece una
+     segunda barra de scroll, la del documento. */
+  height: 100vh;
+  background-color: var(--color-sidebar-bg);
+  color: var(--color-on-primary);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.3s var(--ease-standard), opacity 0.3s ease;
+  position: relative;
+}
+
+/* Colapso manual en escritorio: riel de íconos de 52px fijo, no ocultamiento
+   total — mismo tratamiento visual que el breakpoint compacto automático de
+   más abajo (logo chico, sin label/chevron, ítems centrados), solo que este
+   lo dispara el botón en vez del ancho de ventana. En móvil (≤768px) el
+   colapso sigue siendo la barra horizontal de siempre: ese breakpoint es más
+   específico, cae después en la cascada y gana. */
+.sidebar.collapsed {
+  width: 52px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar-collapsed .sidebar-logo-img {
+  width: 32px;
+}
+
+.sidebar-collapsed .sidebar-header {
+  padding: 20px 8px;
+}
+
+.sidebar-collapsed .sidebar-nav {
+  padding: 16px 8px;
+}
+
+.sidebar-collapsed .tree-item {
+  justify-content: center;
+  padding: 12px 8px;
+}
+
+.sidebar-collapsed .tree-item__label,
+.sidebar-collapsed .tree-item__chevron {
+  display: none;
+}
+
+.sidebar-collapsed .tree-section-start::before {
+  left: 8px;
+  right: 8px;
+}
+
+.sidebar-header {
+  padding: 18px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  /* El que se desplaza es el <nav>: ni el logo ni el pie deben encogerse con la
+     ventana baja. */
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.sidebar-logo-img {
+  width: 148px;
+  height: auto;
+  object-fit: contain;
+  transition: width var(--transition-base);
+}
+
+.logo-circle {
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.logo-text {
+  font-family: var(--font-headline);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-nav {
+  padding: 18px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  /* Un hijo flex arranca con min-height: auto y se niega a encoger por debajo de
+     su contenido, así que sin esta línea el overflow de abajo no haría nada. */
+  min-height: 0;
+  overflow-y: auto;
+  /* Al llegar al final del árbol, la rueda no arrastra la página. */
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+/* Barra más angosta: ítems del nav con fuente, íconos y separación menores.
+   Ámbito acotado a `.sidebar-nav` para no tocar otros usos de TreeView.
+   Solo se ajusta el padding vertical y el gap; el `padding-inline-start` que
+   calcula el nivel de anidado se deja intacto. */
+.sidebar-nav .tree-item {
+  font-size: 13px;
+  gap: 9px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.sidebar-nav .tree-item__icon svg,
+.sidebar-nav .tree-item > svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Separa visualmente los clústeres de primer nivel (Revaluación, Compras,
+   Pagos, Mantenimiento) de Dashboard General/Registros, sin tocar TreeView:
+   solo aire + un filo sutil, vía la `className` que TreeItem ya reenvía al
+   nodo. Ámbito acotado a `.sidebar-nav` para no afectar otros usos de
+   TreeView (p. ej. la demo de /documentacion). */
+.sidebar-nav .tree-item.tree-section-start {
+  margin-top: 12px;
+  padding-top: 20px;
+  position: relative;
+}
+
+.sidebar-nav .tree-item.tree-section-start::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 16px;
+  right: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.content-area {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  min-height: 0;
+  padding: 32px;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* El control de colapsar vive en su propia fila al fondo de la sidebar,
+   separado del logo por un filo (mismo tono que ya usa el divisor de grupos
+   de nav) — antes era un círculo flotante pegado al borde del encabezado,
+   casi encima del isotipo. */
+.sidebar-footer {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px;
+}
+
+.sidebar-toggle-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-on-primary);
+}
+
+.sidebar-toggle-btn svg {
+  transition: transform 0.3s var(--ease-standard);
+  flex-shrink: 0;
+}
+
+.sidebar-toggle-btn.collapsed svg {
+  transform: rotate(180deg);
+}
+
+/* Modo compacto (solo íconos): antes saltaba directo de 260px al colapso
+   horizontal completo de ≤768px, y en el tramo intermedio (p. ej. una
+   tablet apaisada) la única salida era truncar etiquetas con elipsis. Aquí
+   la sidebar se angosta a un riel de íconos en vez de recortar texto —sin
+   tocar el colapso manual (`.sidebar-collapsed`), que sigue ganando si el
+   usuario la ocultó a mano, ni la lógica de expansión de ramas: un TreeItem
+   rama se sigue expandiendo igual al hacer clic, solo que sus hijos también
+   salen icon-only. `title` en cada nodo (TreeView.jsx) es lo que sustituye
+   a la etiqueta visible aquí. */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .dashboard-layout:not(.sidebar-collapsed) {
+    --sidebar-width: 76px;
+  }
+
+  .dashboard-layout:not(.sidebar-collapsed) .sidebar-logo-img {
+    width: 32px;
+  }
+
+  .dashboard-layout:not(.sidebar-collapsed) .sidebar-header {
+    padding: 20px 8px;
+  }
+
+  .dashboard-layout:not(.sidebar-collapsed) .sidebar-nav {
+    padding: 16px 8px;
+  }
+
+  .dashboard-layout:not(.sidebar-collapsed) .tree-item {
+    justify-content: center;
+    padding: 12px 8px;
+  }
+
+  .dashboard-layout:not(.sidebar-collapsed) .tree-item__label,
+  .dashboard-layout:not(.sidebar-collapsed) .tree-item__chevron {
+    display: none;
+  }
+
+  .dashboard-layout:not(.sidebar-collapsed) .tree-section-start::before {
+    left: 8px;
+    right: 8px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+  /* En móvil el control vuelve a ser un botón flotante en la esquina: la
+     fila de `.sidebar-footer` no es alcanzable aquí (el colapso móvil oculta
+     todo salvo el encabezado, ver `.sidebar.collapsed` más abajo), así que
+     necesita salirse del flujo con su propio estilo completo, ya no hereda
+     el de la fila de escritorio. */
+  .sidebar-footer {
+    border-top: none;
+    padding: 0;
+  }
+  .sidebar-toggle-btn {
+    position: absolute;
+    right: 16px;
+    top: 22px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--color-secondary);
+    color: var(--color-on-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 110;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  .sidebar-toggle-btn:hover {
+    background-color: var(--color-secondary-hover, #d97706);
+    transform: scale(1.1);
+  }
+  .sidebar-toggle-btn.collapsed {
+    right: 16px;
+  }
+  .sidebar-toggle-btn svg {
+    transform: rotate(90deg);
+  }
+  .sidebar-toggle-btn.collapsed svg {
+    transform: rotate(-90deg);
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 800px;
+    transition: max-height 0.3s var(--ease-standard);
+    overflow: hidden;
+  }
+  .sidebar.collapsed {
+    max-height: 80px; /* Logo-header height */
+    width: 100% !important;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .sidebar.collapsed .sidebar-nav {
+    display: none;
+  }
+  .content-area {
+    height: auto;
+  }
+  .main-content {
+    padding: 16px;
+  }
+  .topbar {
+    padding: 0 16px;
+  }
+}

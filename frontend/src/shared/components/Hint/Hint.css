@@ -1,0 +1,108 @@
+.hint-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.hint-icon {
+  color: var(--color-outline);
+  opacity: 0.75;
+  transition: all var(--transition-fast);
+}
+
+.hint-container:hover .hint-icon {
+  opacity: 1;
+  color: var(--color-on-surface);
+  transform: scale(1.1);
+}
+
+.hint-container:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.hint-container:focus-visible .hint-icon {
+  opacity: 1;
+  color: var(--color-on-surface);
+}
+
+/* ─── Tooltip renderizado vía React Portal en document.body ─── */
+/* Al portar a document.body queda fuera de #root, así que con el mismo
+ * z-index que el modal gana por orden de documento y sigue viéndose dentro
+ * de él. Por debajo de --z-toast (9999), que debe quedar siempre encima. */
+.hint-portal-tooltip {
+  position: fixed;
+  z-index: var(--z-modal);
+  pointer-events: none;
+  animation: hintFadeIn 150ms ease-out;
+}
+
+@keyframes hintFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Tooltip invertido: fondo con el color del texto y texto con el de la
+ * superficie. Los dos tokens se intercambian solos en el tema oscuro. */
+.hint-portal-content {
+  background-color: var(--color-on-surface);
+  color: var(--color-surface);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: normal;
+  width: max-content;
+  max-width: 260px;
+  box-shadow: var(--shadow-2);
+  border: 1px solid var(--color-outline-variant);
+  text-transform: none; /* Evita que herede uppercase de los th de tablas */
+  letter-spacing: normal;
+}
+
+/* ─── Flecha del Tooltip ─── */
+.hint-portal-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+
+/* Posiciones de la flecha */
+.hint-portal-tooltip.position-top .hint-portal-arrow {
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: var(--color-on-surface);
+}
+
+.hint-portal-tooltip.position-bottom .hint-portal-arrow {
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: var(--color-on-surface);
+}
+
+.hint-portal-tooltip.position-left .hint-portal-arrow {
+  right: -11px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: var(--color-on-surface);
+}
+
+.hint-portal-tooltip.position-right .hint-portal-arrow {
+  left: -11px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: var(--color-on-surface);
+}

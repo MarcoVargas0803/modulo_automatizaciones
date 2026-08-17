@@ -1,0 +1,80 @@
+.shipment-invites-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+/* Variante compacta de la utilidad global `.muted-text` (index.css), para los
+   subtitulos de celda de esta tabla. Es la misma regla que
+   `InternationalPurchases.css:71-74`, de la que esta pantalla dependia mientras
+   vivia dentro de aquella pagina; al salir de ella se la habria quedado atras y
+   las celdas habrian cambiado de tamano sin que nada lo delatara. La
+   duplicacion es deliberada: acotarla a cada contenedor es lo que impide que
+   redefina la utilidad para toda la aplicacion, que es el bug que aquel
+   comentario explica. */
+.shipment-invites-page .muted-text {
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
+.invite-intro {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+}
+
+.invite-forwarder {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.invite-header-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-0);
+}
+
+.invite-actions {
+  display: flex;
+  gap: var(--spacing-0);
+  flex-wrap: wrap;
+}
+
+/* El enlace es largo y no tiene espacios: sin `break-all` desborda la caja del
+   modal en lugar de partirse. Se muestra completo a proposito, porque es la
+   unica vez que existe en claro y el operador tiene que poder seleccionarlo a
+   mano si el portapapeles del navegador falla. */
+.invite-link-box {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  flex-wrap: wrap;
+  margin: var(--spacing-2) 0;
+  padding: var(--spacing-1);
+  background: var(--color-surface-variant);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+}
+
+.invite-link {
+  flex: 1 1 320px;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-on-surface);
+  word-break: break-all;
+  user-select: all;
+}
+
+.invite-errors {
+  margin: 0;
+  padding-left: var(--spacing-2);
+}
+
+.invite-confirm {
+  margin: 0 0 var(--spacing-3);
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+}

@@ -1,0 +1,33 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6) var(--spacing-4);
+  text-align: center;
+  gap: var(--spacing-2);
+  animation: fade-in var(--transition-base) var(--ease-standard) both;
+}
+
+.empty-state-icon {
+  color: var(--color-outline);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.empty-state-title {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.empty-state-description {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-muted-text);
+  max-width: 320px;
+  line-height: 1.6;
+  margin: 0;
+}

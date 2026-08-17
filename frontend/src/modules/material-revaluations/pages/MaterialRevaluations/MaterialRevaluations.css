@@ -1,0 +1,564 @@
+.material-revaluations-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.revaluations-workspace {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 20px;
+  min-height: 620px;
+}
+
+
+
+.pending-list,
+.review-panel {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.review-panel:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-2);
+}
+
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pending-list:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-2);
+}
+
+.pending-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  font-family: var(--font-label);
+  font-weight: 700;
+}
+
+.pending-list-header strong {
+  color: var(--color-primary);
+}
+
+/* Con pocos pendientes, `.pending-list` (columna flex) se estira para
+   igualar la altura de `.review-panel` y deja hueco vacío bajo el último
+   ítem — `margin-top: auto` ancla esta nota al fondo de ese hueco, sin
+   importar cuántos ítems haya arriba. */
+.pending-list-footer {
+  margin: auto 0 0;
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-outline-variant);
+  font-family: var(--font-label);
+  font-size: 12.5px;
+  color: var(--color-muted-text);
+  text-align: center;
+}
+
+.pending-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-bottom: 1px solid var(--color-surface-variant);
+  background: var(--color-surface-elevated);
+  text-align: left;
+  cursor: pointer;
+}
+
+.pending-item:hover,
+.pending-item.active {
+  background-color: var(--color-surface-variant);
+}
+
+.pending-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--color-on-surface);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.pending-meta {
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.pending-requester {
+  color: var(--color-muted-text);
+  font-size: 12px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-requester {
+  margin-top: 4px;
+  color: var(--color-on-surface-variant);
+  font-size: 13px;
+}
+
+.review-requester strong {
+  color: var(--color-on-surface);
+}
+
+.review-requester-email {
+  color: var(--color-muted-text);
+}
+
+.review-panel {
+  min-width: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.review-placeholder {
+  color: var(--color-on-surface-variant);
+  padding: 24px;
+}
+
+.review-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.review-toolbar h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.review-toolbar p {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+}
+
+.review-proration-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-proration-control label,
+.reject-box label {
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+}
+
+.review-proration-control select,
+.reject-box textarea,
+.review-lines-table input,
+.review-lines-table select {
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-elevated);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.review-proration-control select {
+  min-width: 144px;
+  padding: 8px 10px;
+}
+
+.review-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.review-metrics>div {
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.review-metrics span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.review-metrics strong {
+  font-size: 16px;
+}
+
+/* Sombra de scroll horizontal sin JS — mismo truco que `.data-table-container`
+   (`shared/components/DataTable/DataTable.css`): dos "cover" que se desplazan
+   con el contenido (background-attachment: local) tapan la sombra de su lado
+   en cuanto ya no queda más que scrollear, y dos radial-gradient fijos
+   (background-attachment: scroll) son la sombra en sí. */
+.review-lines-table {
+  overflow: auto;
+  /* Scroll interno con tope de alto: antes la tabla crecía con el número de
+     artículos y empujaba el alto de toda la página. Mismo criterio que
+     `.review-table-wrapper .data-table-container` en LogDetail.css. */
+  max-height: 520px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-elevated);
+  background-image:
+    linear-gradient(to right, var(--color-surface-elevated) 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(to left, var(--color-surface-elevated) 30%, rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.review-lines-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* `--color-primary` no sirve aquí: en modo oscuro se redeclara como un tono
+   claro (es el acento, pensado para texto/bordes, no para un bloque de
+   fondo), así que el header se quedaba durazno claro sobre una página oscura.
+   Mismo token que ya usa el header de `DataTable` — un fondo neutro que sí
+   tiene su contraparte oscura coherente. */
+.review-lines-table th {
+  padding: 10px 12px;
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+  border-bottom: 1px solid var(--color-outline-variant);
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.review-lines-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  font-size: 14px;
+  white-space: nowrap;
+  /* Mismo criterio que `.data-table-td` (DataTable.css): se aplica a toda
+     celda, no solo a las numéricas — barato de tener y evita listar columnas
+     una por una. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* La columna Descripción absorbe el ancho sobrante para que la tabla llene el panel
+   sin dejar una última columna estirada en blanco. */
+.review-lines-table th:nth-child(2),
+.review-lines-table td:nth-child(2) {
+  white-space: normal;
+  width: 100%;
+  min-width: 220px;
+}
+
+.review-lines-table input {
+  width: 112px;
+  padding: 7px 8px;
+}
+
+.review-lines-table select {
+  padding: 6px 8px;
+}
+
+.reject-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reject-box textarea {
+  resize: vertical;
+  min-height: 96px;
+  padding: 10px 12px;
+}
+
+.review-actions-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2);
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.confirm-modal {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--spacing-3);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-elevated);
+  box-shadow: var(--shadow-modal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.confirm-modal h3 {
+  margin: 0;
+  font-family: var(--font-headline);
+  color: var(--color-on-surface);
+}
+
+.confirm-modal p {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 980px) {
+  .revaluations-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .review-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+
+  .review-toolbar,
+  .review-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-proration-control {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .review-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+/* ─── "Cómo se calculó" (modal de todos los productos) ─── */
+.review-lines-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.calc-detail-modal {
+  max-width: 860px;
+  width: 100%;
+}
+
+.calc-formula-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 8px;
+}
+
+.calc-formula-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.calc-formula-steps strong {
+  color: var(--color-on-surface);
+  font-weight: 700;
+}
+
+.calc-step-num {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.calc-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+}
+
+.calc-manual-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: var(--color-warning-container);
+  color: var(--color-on-warning-container);
+  border: 1px solid var(--color-warning);
+}
+
+.calc-detail-table tfoot td {
+  font-weight: 700;
+  background: var(--color-surface-variant);
+  border-top: 2px solid var(--color-outline-variant);
+}
+
+.calc-detail-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+}
+
+/* Mismo truco de sombra de scroll que `.review-lines-table`, ver ahí. */
+.calc-detail-table-wrap {
+  overflow-x: auto;
+  background-color: var(--color-surface-elevated);
+  background-image:
+    linear-gradient(to right, var(--color-surface-elevated) 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(to left, var(--color-surface-elevated) 30%, rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.calc-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.calc-detail-table th,
+.calc-detail-table td {
+  text-align: left;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.calc-detail-table thead th {
+  background: var(--color-surface-variant);
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+}
+
+.calc-detail-table td.calc-result {
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.calc-detail-manual {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-container);
+  border: 1px solid var(--color-warning);
+  color: var(--color-on-warning-container);
+  font-size: 12.5px;
+}
+
+/* ─── Badge Sugerido/Manual + restaurar (#4) ─── */
+.cost-cell-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cost-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.cost-badge.suggested {
+  background: var(--color-info-container);
+  color: var(--color-on-info-container);
+  border: 1px solid var(--color-info);
+}
+
+.cost-badge.manual {
+  background: var(--color-warning-container);
+  color: var(--color-on-warning-container);
+  border: 1px solid var(--color-warning);
+}
+
+.cost-restore-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.cost-restore-btn:hover {
+  color: var(--color-secondary);
+}
+
+/* ─── Métrica con hint (#5) ─── */
+.metric-with-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

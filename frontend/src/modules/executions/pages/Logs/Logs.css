@@ -1,0 +1,22 @@
+/* La barra de filtros (tarjeta, búsqueda, panel desplegable y chips) vive ahora
+ * en components/FilterBar/FilterBar.css. Al extraerla se renombraron
+ * `.search-box` y `.search-icon`, que chocaban con las declaraciones del mismo
+ * nombre en ShipmentsFilterBar.css — archivo ya retirado. */
+
+.logs-page {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* El componente trae `margin-bottom` para las páginas que son bloques sin
+ * `gap` (las de Mantenimiento). Aquí sobra: el `gap` de arriba ya separa. */
+.logs-page .filter-bar-wrapper {
+  margin-bottom: 0;
+}
+
+/* Compensa el `gap: 32px` de la página para pegar el conteo a la barra. */
+.logs-result-count {
+  margin: -16px 0 0;
+  font-size: 0.85rem;
+}

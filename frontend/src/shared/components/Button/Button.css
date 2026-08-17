@@ -1,0 +1,98 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  gap: var(--spacing-1);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  white-space: nowrap;
+  min-height: 40px;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Variante: primary ─── */
+.btn-primary {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+}
+
+/* ─── Variante: secondary ─── */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-outline);
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-variant);
+  border-color: var(--color-secondary);
+}
+
+/* ─── Variante: ghost ─── */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-on-surface-variant);
+}
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-surface-variant);
+  color: var(--color-on-surface);
+}
+
+/* ─── Variante: danger (acciones destructivas) ─── */
+.btn-danger {
+  background-color: var(--color-error);
+  color: var(--color-on-error);
+  border-color: var(--color-error);
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--color-on-error-container);
+  border-color: var(--color-on-error-container);
+}
+
+/* ─── Variante: icon (botón cuadrado solo con ícono) ─── */
+.btn-icon {
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  background-color: transparent;
+  color: var(--color-on-surface-variant);
+  border-color: var(--color-outline-variant);
+}
+.btn-icon:hover:not(:disabled) {
+  background-color: var(--color-surface-variant);
+  color: var(--color-on-surface);
+}
+
+/* ─── Estado de carga ─── */
+.btn-loading {
+  pointer-events: none;
+  opacity: 0.75;
+}

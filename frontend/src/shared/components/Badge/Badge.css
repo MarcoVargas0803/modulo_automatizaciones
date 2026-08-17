@@ -1,0 +1,74 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-label);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+/* Disparador de `Hint` cuando la insignia lleva `hint`. `.hint-container` trae
+   `margin-left: 6px` para separar el icono de interrogación del texto de un
+   encabezado; en una insignia ese margen es parásito y descuadra las filas de
+   varias. */
+.badge-hint {
+  margin-left: 0;
+}
+
+/* ─── Tamaños ─── */
+.badge-sm {
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.badge-md {
+  font-size: 12px;
+  padding: 3px 10px;
+}
+
+/* ─── Variantes semánticas ─── */
+.badge-success {
+  background-color: var(--color-success-container);
+  color: var(--color-on-success-container);
+  border-color: var(--color-success);
+}
+
+.badge-error {
+  background-color: var(--color-error-container);
+  color: var(--color-on-error-container);
+  border-color: var(--color-error);
+}
+
+.badge-warning {
+  background-color: var(--color-warning-container);
+  color: var(--color-on-warning-container);
+  border-color: var(--color-warning);
+}
+
+.badge-info {
+  background-color: var(--color-info-container);
+  color: var(--color-on-info-container);
+  border-color: var(--color-info);
+}
+
+.badge-stuck {
+  background-color: var(--color-stuck-container);
+  color: var(--color-on-stuck-container);
+  border-color: var(--color-stuck);
+}
+
+.badge-default {
+  background-color: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+  border-color: var(--color-outline-variant);
+}
+
+.badge-primary {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+  border-color: var(--color-primary);
+}

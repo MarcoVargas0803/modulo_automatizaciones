@@ -1,0 +1,175 @@
+/* Zona «Bitácora»: conserva superficie propia (función real — es sticky,
+   se queda fija mientras el resto de la página se mueve). Ver Parte IV. */
+.timeline-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  background-color: var(--color-surface-elevated);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  padding: 20px;
+}
+
+.timeline-pending-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-warning-container);
+  color: var(--color-on-warning-container);
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.timeline-title {
+  margin: 0;
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--color-on-surface);
+}
+
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 0 0 16px 20px;
+}
+
+.timeline-item--last {
+  padding-bottom: 0;
+}
+
+.timeline-item:not(.timeline-item--last)::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 14px;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--color-divider);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.timeline-dot-success {
+  background-color: var(--color-success);
+}
+
+.timeline-dot-error {
+  background-color: var(--color-error);
+}
+
+.timeline-dot-warning {
+  background-color: var(--color-warning);
+}
+
+.timeline-dot-info {
+  background-color: var(--color-info);
+}
+
+.timeline-dot-neutral {
+  background-color: var(--color-muted-text);
+}
+
+.timeline-item-link,
+.timeline-item-static {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  margin: -2px -6px;
+  transition: background-color var(--transition-fast);
+}
+
+.timeline-item-link:hover {
+  background-color: var(--color-surface-variant);
+}
+
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.timeline-content-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ícono de origen (ejecución vs. nodo con error) — mismos tokens semánticos
+   que ya usa `.timeline-dot-*`, solo se le suma forma al color. */
+.timeline-content-icon {
+  flex-shrink: 0;
+}
+
+.timeline-content-icon-success {
+  color: var(--color-success);
+}
+
+.timeline-content-icon-error {
+  color: var(--color-error);
+}
+
+.timeline-content-icon-warning {
+  color: var(--color-warning);
+}
+
+.timeline-content-icon-info {
+  color: var(--color-info);
+}
+
+.timeline-content-icon-neutral {
+  color: var(--color-muted-text);
+}
+
+.timeline-content-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-muted-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-time {
+  flex-shrink: 0;
+  font-family: var(--font-label);
+  font-size: 11px;
+  color: var(--color-muted-text);
+  white-space: nowrap;
+}
+
+.timeline-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted-text);
+  font-style: italic;
+}

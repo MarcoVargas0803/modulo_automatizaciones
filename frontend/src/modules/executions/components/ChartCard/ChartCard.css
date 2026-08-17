@@ -1,0 +1,30 @@
+/* La altura va aquí, en píxeles, y no en el ResponsiveContainer de Recharts:
+   dentro de un flex en columna un alto porcentual colapsa a 0 y la gráfica
+   desaparece sin lanzar ningún error. El valor concreto llega por style desde
+   la prop `height`. */
+.chart-card-body {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+/* El EmptyState no debe estirarse al alto completo de la gráfica: se centra. */
+.chart-card-body .empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Los textos de los ejes y de la leyenda los pinta Recharts como <text> del SVG,
+   fuera del alcance de las utilidades globales. */
+.chart-card-body .recharts-cartesian-axis-tick-value,
+.chart-card-body .recharts-legend-item-text {
+  font-family: var(--font-label);
+  fill: var(--color-muted-text);
+}
+
+.chart-card-body .recharts-legend-item-text {
+  color: var(--color-on-surface-variant);
+}

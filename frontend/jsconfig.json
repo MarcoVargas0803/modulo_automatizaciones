@@ -1,0 +1,18 @@
+{
+  // Sólo para el editor: permite a VS Code resolver el alias '@/' en
+  // autocompletado e ir-a-definición. La resolución real en build/dev la
+  // hace 'resolve.alias' en vite.config.js — ambos deben mantenerse en sync.
+  // Sin 'baseUrl' (en desuso), las rutas de 'paths' se resuelven relativas
+  // a este archivo.
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "jsx": "react-jsx",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "esnext"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

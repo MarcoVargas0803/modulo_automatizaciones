@@ -1,0 +1,167 @@
+{
+  "name": "Invitacion_registro_forwarder",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Contrato con el portal\n\nRecibe de triggerForwarderInvite():\n\ntrigger, source, requestedAt, forwarderName, recipientEmail, registrationUrl, issuedBy { userId, username }\n\nResponde para que parseNotificationConfirmation distinga los tres casos:\n\n- 200 success:true notified:true — el correo salio\n- 502 success:false notified:false — n8n lo recibio, SMTP fallo\n- 400 success:false notified:false — payload invalido",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "6f6c27e1-9ba5-4e37-a7b9-109265ced25b",
+      "name": "Nota Contrato",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-32, -144]
+    },
+    {
+      "parameters": {
+        "content": "## registrationUrl es un credencial\n\nQuien tenga esa URL puede registrar embarques a nombre de Maderas Rivero.\n\nNO agregar nodos que la escriban en base de datos, logs ni otro sistema. Por eso este flujo no audita en audit.workflow_events como los demas: el portal ya lo registra con logActivity.\n\nRevisar en Settings del workflow: poner Save successful production executions en Do not save. Si no, la URL queda guardada en el historial de ejecuciones de n8n.",
+        "height": 280,
+        "width": 520,
+        "color": 3
+      },
+      "id": "f6937f65-6cc0-4249-ac3b-3bdc2cd7b0da",
+      "name": "Nota Seguridad",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [608, -208]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "international-purchases/forwarder-invite",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "76f6b885-2e5c-4e19-b23b-9a3274ee90c8",
+      "name": "Webhook Portal Invitacion Forwarder",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 304],
+      "webhookId": "1c44db9b-505e-4097-9db4-260b6774c52b"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst body = raw.body || raw;\n\nconst forwarderName = String(body.forwarderName || '').trim();\nconst recipientEmail = String(body.recipientEmail || '').trim();\nconst registrationUrl = String(body.registrationUrl || '').trim();\nconst issuedBy = body.issuedBy || {};\n\nconst faltantes = [];\nif (!forwarderName) faltantes.push('forwarderName');\nif (!recipientEmail) faltantes.push('recipientEmail');\nif (!registrationUrl) faltantes.push('registrationUrl');\n\nconst problemas = [];\nif (faltantes.length > 0) problemas.push('Faltan campos obligatorios: ' + faltantes.join(', '));\n\nif (recipientEmail && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipientEmail)) {\n  problemas.push('recipientEmail no tiene formato de correo');\n}\n\n// Comprobacion por prefijo a proposito: el sandbox del nodo Code NO expone el\n// global URL, y usar new URL() aqui lanzaba ReferenceError que el catch se tragaba,\n// rechazando URLs https perfectamente validas.\nif (registrationUrl) {\n  const u = registrationUrl.toLowerCase();\n  const protocoloOk =\n    u.startsWith('https://') ||\n    u.startsWith('http://localhost') ||\n    u.startsWith('http://127.0.0.1');\n  if (!protocoloOk) {\n    problemas.push('registrationUrl debe usar https (localhost solo se admite en pruebas)');\n  }\n}\n\nconst esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\nconst nombre = esc(forwarderName);\nconst url = esc(registrationUrl);\n\nconst html = [\n  '<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\">',\n  '<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>',\n  '<body style=\"margin:0;padding:24px;background:#fcf9f8;font-family:Arial,Helvetica,sans-serif;color:#1b1c1c;\">',\n  '<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #d6c3b9;border-radius:12px;\">',\n  '<tr><td style=\"background:#421e04;color:#ffffff;padding:20px 24px;border-radius:12px 12px 0 0;\">',\n  '<div style=\"font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.85;\">Maderas Rivero S.A. de C.V.</div>',\n  '<div style=\"font-size:20px;font-weight:bold;margin-top:4px;\">Registro de embarques</div>',\n  '</td></tr>',\n  '<tr><td style=\"padding:24px;\">',\n  '<p style=\"margin:0 0 16px;font-size:15px;line-height:1.6;\">Estimados <strong>' + nombre + '</strong>:</p>',\n  '<p style=\"margin:0 0 16px;font-size:15px;line-height:1.6;\">Habilitamos un enlace para que registren directamente en nuestro sistema los embarques que operan para nosotros: referencia (MBL), naviera, SCAC, contenedores, proveedor, material y factura.</p>',\n  '<p style=\"margin:0 0 24px;font-size:15px;line-height:1.6;\">El enlace es <strong>permanente</strong>: consérvenlo y úsenlo cuantas veces necesiten, un registro por embarque. No necesitan crear cuenta ni contraseña.</p>',\n  '<table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:0 auto 24px;\"><tr><td style=\"background:#421e04;border-radius:8px;\">',\n  '<a href=\"' + url + '\" style=\"display:inline-block;padding:14px 28px;color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;\">Registrar un embarque</a>',\n  '</td></tr></table>',\n  '<p style=\"margin:0 0 8px;font-size:13px;line-height:1.6;color:#70635d;\">Si el botón no funciona, copien esta dirección en su navegador:</p>',\n  '<p style=\"margin:0 0 24px;font-size:12px;line-height:1.5;word-break:break-all;color:#51443d;\">' + url + '</p>',\n  '<p style=\"margin:0;padding:12px 16px;background:#fef3c7;border-left:4px solid #92400e;font-size:13px;line-height:1.6;color:#92400e;\">Este enlace es exclusivo de su organización y permite registrar embarques a nuestro nombre. Por favor no lo reenvíen fuera de su equipo de operaciones. Si sospechan que se difundió, avísennos para reemplazarlo.</p>',\n  '</td></tr>',\n  '<tr><td style=\"padding:16px 24px;border-top:1px solid #e0d9d4;font-size:12px;color:#70635d;\">Mensaje automático del portal de Maderas Rivero. Para dudas, respondan a este correo.</td></tr>',\n  '</table></body></html>'\n].join('');\n\nconst texto = [\n  'Estimados ' + forwarderName + ':',\n  '',\n  'Habilitamos un enlace para que registren directamente los embarques que operan para nosotros (MBL, naviera, SCAC, contenedores, proveedor, material y factura).',\n  '',\n  'El enlace es permanente: consérvenlo y úsenlo cuantas veces necesiten, un registro por embarque. No necesitan cuenta ni contraseña.',\n  '',\n  registrationUrl,\n  '',\n  'Este enlace es exclusivo de su organización. Por favor no lo reenvíen fuera de su equipo de operaciones.',\n  '',\n  'Mensaje automático del portal de Maderas Rivero.'\n].join('\\n');\n\nreturn [{\n  json: {\n    valido: problemas.length === 0,\n    motivo: problemas.join('. '),\n    forwarder_name: forwarderName,\n    to_email: recipientEmail,\n    subject_email: 'Registro de embarques - Maderas Rivero',\n    html_email: html,\n    text_email: texto,\n    issued_by: issuedBy.username || null\n  }\n}];"
+      },
+      "id": "a61e2e5c-51c9-4efe-b1c2-8545b1516c61",
+      "name": "Validar y Componer Correo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [224, 304]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "es-valida",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d929e2dd-abc7-414e-818b-f5f217f4cbd2",
+      "name": "Invitacion Valida?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [448, 304]
+    },
+    {
+      "parameters": {
+        "fromEmail": "agenteia@maderasrivero.com",
+        "toEmail": "={{ $json.to_email }}",
+        "subject": "={{ $json.subject_email }}",
+        "emailFormat": "both",
+        "text": "={{ $json.text_email }}",
+        "html": "={{ $json.html_email }}",
+        "options": { "appendAttribution": false }
+      },
+      "id": "344bf084-3219-4cdd-92c2-0ff1ebf1fb8e",
+      "name": "Enviar Invitacion al Forwarder",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [672, 208],
+      "webhookId": "d7ab2546-b323-482b-91d5-3f8b44830d0f",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"success\": true, \"notified\": true, \"message\": \"Invitacion enviada al forwarder.\" }",
+        "options": { "responseCode": 200 }
+      },
+      "id": "cc3f984a-ca12-4a76-b6f5-495196dfe8d4",
+      "name": "Responder Enviado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [880, 128]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, notified: false, message: \"n8n recibio la invitacion pero el correo no pudo enviarse: \" + ($json.error?.message ?? $json.message ?? \"error desconocido en SMTP\") }) }}",
+        "options": { "responseCode": 502 }
+      },
+      "id": "883924b3-1950-47a0-a047-7437330b70c1",
+      "name": "Responder Fallo de Envio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [880, 320]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, notified: false, message: $json.motivo }) }}",
+        "options": { "responseCode": 400 }
+      },
+      "id": "7ba17f7a-a757-40e6-9365-98357815042f",
+      "name": "Responder Datos Invalidos",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [672, 464]
+    }
+  ],
+  "connections": {
+    "Webhook Portal Invitacion Forwarder": {
+      "main": [[{ "node": "Validar y Componer Correo", "type": "main", "index": 0 }]]
+    },
+    "Validar y Componer Correo": {
+      "main": [[{ "node": "Invitacion Valida?", "type": "main", "index": 0 }]]
+    },
+    "Invitacion Valida?": {
+      "main": [
+        [{ "node": "Enviar Invitacion al Forwarder", "type": "main", "index": 0 }],
+        [{ "node": "Responder Datos Invalidos", "type": "main", "index": 0 }]
+      ]
+    },
+    "Enviar Invitacion al Forwarder": {
+      "main": [
+        [{ "node": "Responder Enviado", "type": "main", "index": 0 }],
+        [{ "node": "Responder Fallo de Envio", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "pinData": {},
+  "tags": []
+}

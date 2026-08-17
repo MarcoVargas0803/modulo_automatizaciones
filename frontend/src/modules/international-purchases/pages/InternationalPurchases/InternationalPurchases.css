@@ -1,0 +1,141 @@
+.international-purchases-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Estas dos vivian solo en modules/executions/.../Dashboard.css y esta pagina
+   las consumia por fuga del CSS global: limpiar aquel archivo la habria roto sin
+   que nada lo delatara. Se copian aqui —misma definicion, verificada contra
+   Dashboard.css:110-122— para que la pagina no dependa de otro modulo. La
+   duplicacion es deliberada y menor que el acoplamiento que sustituye; si
+   aparece un tercer consumidor fuera de executions, el sitio de estas reglas es
+   index.css, no un modulo. */
+.section-title {
+  margin: 0;
+  color: var(--color-on-surface);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted-text);
+  font-size: 0.875rem;
+}
+
+.shipments-section {
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all var(--transition-base);
+}
+
+.shipments-section:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-2);
+}
+
+/* Cabecera de seccion; aloja el atajo "Sin revisar" a la derecha. Estaba
+   declarada dos veces en este mismo archivo y ganaba la segunda: se conserva
+   esa, que es la que se estaba viendo. */
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+/* Variante compacta de la utilidad global `.muted-text` (index.css), para los
+   subtitulos de celda de esta tabla. Antes se declaraba sin acotar, asi que
+   redefinia la utilidad para toda la aplicacion en cuanto se cargaba este CSS:
+   cualquier pagina abierta despues heredaba 0.8rem y un margen que no habia
+   pedido. Acotarla al contenedor de la pagina deja el aspecto igual —los tres
+   modales se montan dentro de `.international-purchases-page`— y devuelve la
+   utilidad global a su definicion. */
+.international-purchases-page .muted-text {
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
+.refreshing-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--color-muted-text);
+  vertical-align: middle;
+}
+
+.refreshing-hint-icon {
+  animation: refreshing-spin 1s linear infinite;
+}
+
+@keyframes refreshing-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Advertencias de un embarque: una insignia por código, con su explicación en
+   el `hint`. Lo consumen la columna de la tabla y la ficha del modal —de ahí
+   que viva en el CSS de la página y no junto al modal, que no tiene hoja
+   propia; es la misma deuda que `.shipment-review-actions`, más abajo—. */
+.shipment-warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-0);
+}
+
+/* Distintivo de embarque sin revisar, junto a la referencia en la tabla. */
+.shipment-review-badge {
+  margin-left: var(--spacing-0);
+  vertical-align: middle;
+}
+
+/* Fila de un embarque descartado. Solo aparece si se pide explicitamente por el
+   filtro de revision, asi que atenuarla no esconde nada: separa lo apartado de
+   lo vigente cuando se listan juntos.
+
+   La atenuacion es un refuerzo, NO el mensaje: quien lo dice con palabras es el
+   Badge "Descartado" de la columna de referencia. El texto se deja por encima
+   de 0.6 para no bajar del contraste minimo legible. */
+.shipment-row--discarded {
+  opacity: 0.62;
+}
+
+.shipment-row--discarded:hover {
+  opacity: 1;
+}
+
+/* Bloque de revision del modal de detalles. Solo se pinta cuando el embarque
+   lo registro un forwarder y sigue pendiente. */
+.shipment-review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-2);
+  padding: var(--spacing-1);
+  background: var(--color-warning-container);
+  border-radius: var(--radius-md);
+}
+
+.shipment-review-actions .muted-text {
+  color: var(--color-on-warning-container);
+}
+
+.shipment-review-buttons {
+  display: flex;
+  gap: var(--spacing-0);
+}

@@ -1,0 +1,158 @@
+/*
+  TreeView.css — Árbol de navegación.
+
+  Dos variantes en el mismo archivo, no en el CSS de quien lo usa (regla #5 de
+  DESIGN.md): `surface` para contenido sobre fondo claro y `sidebar` para la
+  barra lateral oscura, donde replica el aspecto de `.nav-item`.
+
+  La indentación se calcula con la variable `--tree-item-level`, que el propio
+  componente escribe en cada nodo: así el hover y el fondo del activo ocupan la
+  fila completa aunque el texto esté sangrado.
+*/
+
+.tree-view,
+.tree-view__group {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tree-view__group {
+  margin-top: 4px;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* --tree-item-indent-base es el margen del nivel 1; la variante `sidebar` lo
+     reduce (Parte X del documento de diseño) sin tocar la fórmula de
+     indentación por nivel de las demás. */
+  --tree-item-indent-base: 16px;
+  padding: 12px 16px;
+  padding-inline-start: calc(var(--tree-item-indent-base) + (var(--tree-item-level, 1) - 1) * var(--spacing-3));
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-label);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast) var(--ease-standard),
+    color var(--transition-fast) var(--ease-standard);
+}
+
+.tree-item__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.tree-item--expanded > .tree-item__chevron {
+  transform: rotate(90deg);
+}
+
+.tree-item__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-item__badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-error-container);
+  color: var(--color-on-error-container);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.tree-item[aria-disabled='true'],
+.tree-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Variante surface: sobre contenido claro ─── */
+
+.tree-view--surface .tree-item {
+  color: var(--color-on-surface-variant);
+}
+
+.tree-view--surface .tree-item:hover:not([aria-disabled='true']):not(:disabled) {
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface);
+}
+
+.tree-view--surface .tree-item--selected,
+.tree-view--surface .tree-item--active {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+
+.tree-view--surface .tree-item:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* ─── Variante sidebar: sobre --color-sidebar-bg, oscuro en ambos temas ─── */
+
+/* Padding horizontal más ajustado que el de la variante `surface` (Parte X del
+   documento de diseño): la sidebar se angostó de 300px a 260px y estos 2px
+   ayudan a que las etiquetas más largas quepan sin recortarse. Se ajusta la
+   variable de indentación (no `padding-left` directo) para no pisar el
+   `padding-inline-start` que calcula el nivel de anidado — y `padding-right`
+   aparte, que ese sí es un valor físico normal. Acotado a esta variante para
+   no mover el ritmo de la variante `surface` en otros usos de TreeView. */
+.tree-view--sidebar .tree-item {
+  --tree-item-indent-base: 14px;
+  padding-right: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tree-view--sidebar .tree-item:hover:not([aria-disabled='true']):not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-on-primary);
+}
+
+/* El estado activo es un acento, no un relleno: una barra de 3px en `inset
+   box-shadow` (no un `border`, para no desplazar el contenido) + un tinte muy
+   sutil. El ámbar de marca marca "estás aquí", no pinta el bloque entero —
+   ver Parte VII, principio 3 del documento de diseño. */
+.tree-view--sidebar .tree-item--selected,
+.tree-view--sidebar .tree-item--active {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 0 var(--color-secondary);
+}
+
+.tree-view--sidebar .tree-item:focus-visible {
+  outline: 2px solid var(--color-on-primary);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-item,
+  .tree-item__chevron {
+    transition: none;
+  }
+}

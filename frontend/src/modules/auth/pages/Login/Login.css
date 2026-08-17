@@ -1,0 +1,279 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-background);
+  padding: var(--spacing-2);
+  transition: background-color var(--transition-slow);
+}
+
+.login-shell {
+  width: 100%;
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  transition: background-color var(--transition-slow), border-color var(--transition-slow);
+}
+
+/* ---------- Panel de marca ---------- */
+
+.login-brand {
+  /* El panel de marca es fijo-oscuro en ambos temas (misma idea que
+     --color-sidebar-bg), así que su texto no puede usar tokens semánticos
+     como --color-on-primary: esos se invierten en modo oscuro asumiendo que
+     van sobre una superficie que también se invierte, y aquí no es el caso.
+     Mismo criterio que ya usa DashboardLayout.css con blancos literales para
+     el texto de la sidebar. */
+  --brand-on-dark: rgba(255, 255, 255, 0.94);
+  --brand-on-dark-muted: rgba(255, 255, 255, 0.7);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-5) var(--spacing-4);
+  background: linear-gradient(165deg, var(--color-sidebar-bg) 0%, #2c1508 100%);
+  color: var(--brand-on-dark);
+  overflow: hidden;
+  transition: background-color var(--transition-slow);
+}
+
+.login-brand-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 20%, rgba(253, 153, 35, 0.16) 0, transparent 42%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04) 0,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 1px,
+      transparent 34px
+    );
+  pointer-events: none;
+}
+
+.login-brand-top,
+.login-brand-copy,
+.login-brand-footer {
+  position: relative;
+}
+
+.login-brand-top {
+  margin-bottom: var(--spacing-6);
+}
+
+.login-brand-logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Sin la copia de marketing que llevaba antes (eyebrow, descripción, lista
+   de highlights) el panel se queda con logo arriba, marca al centro y
+   copyright abajo — `margin: auto 0` centra ese bloque en el espacio que
+   sobra entre uno y otro, en vez de pegarlo al fondo como cuando había más
+   contenido debajo. */
+.login-brand-copy {
+  margin: auto 0;
+}
+
+.login-brand-title {
+  font-family: var(--font-headline);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 0;
+  max-width: 14ch;
+  color: var(--brand-on-dark);
+}
+
+.login-brand-footer {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------- Panel de formulario ---------- */
+
+.login-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-5) var(--spacing-4);
+  transition: background-color var(--transition-slow);
+}
+
+.login-panel-inner {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.login-theme-toggle {
+  position: absolute;
+  top: var(--spacing-3);
+  right: var(--spacing-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast),
+    background-color var(--transition-slow), transform var(--transition-fast);
+}
+
+.login-theme-toggle:hover {
+  color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  transform: rotate(-8deg);
+}
+
+.login-panel-header {
+  margin-bottom: var(--spacing-4);
+}
+
+.login-eyebrow {
+  font-family: var(--font-label);
+  font-size: 13px;
+  color: var(--color-secondary);
+  margin: 0 0 var(--spacing-0);
+}
+
+.login-title {
+  font-family: var(--font-headline);
+  font-size: 26px;
+  margin: 0 0 var(--spacing-1);
+  color: var(--color-on-surface);
+  transition: color var(--transition-slow);
+}
+
+.login-subtitle {
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  transition: color var(--transition-slow);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.login-field {
+  position: relative;
+}
+
+.login-field-icon {
+  position: absolute;
+  left: 12px;
+  bottom: 9px;
+  display: flex;
+  align-items: center;
+  color: var(--color-muted-text);
+  pointer-events: none;
+}
+
+.login-input-with-icon .input-field {
+  padding-left: 40px;
+}
+
+.login-field-password .login-toggle-password {
+  position: absolute;
+  right: 8px;
+  bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  color: var(--color-muted-text);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.login-field-password .login-toggle-password:hover {
+  color: var(--color-on-surface);
+}
+
+.login-field-password .login-toggle-password:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.login-actions {
+  margin-top: var(--spacing-1);
+}
+
+.login-submit-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+}
+
+.login-session-conflict-message {
+  color: var(--color-on-surface-variant);
+}
+
+.login-session-conflict-modal {
+  max-width: 420px;
+}
+
+.login-session-conflict-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-1);
+}
+
+@media (max-width: 900px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .login-brand {
+    padding: var(--spacing-4);
+  }
+
+  .login-brand-top {
+    margin-bottom: var(--spacing-3);
+  }
+
+  .login-brand-logo {
+    width: 140px;
+  }
+
+  .login-brand-copy {
+    margin: var(--spacing-4) 0 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 0;
+  }
+
+  .login-shell {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .login-session-conflict-actions {
+    flex-direction: column-reverse;
+  }
+
+  .login-session-conflict-actions .btn {
+    width: 100%;
+  }
+}

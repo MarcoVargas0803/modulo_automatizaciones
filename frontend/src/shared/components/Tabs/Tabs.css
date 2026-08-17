@@ -1,0 +1,78 @@
+/*
+  Tabs.css — Píldoras dentro de una caja. Es el aspecto que ya usaban, con CSS
+  duplicado, MaintenanceRequests y MaintenanceCatalogs.
+*/
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--spacing-3);
+  background: var(--color-surface);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-outline-variant);
+  width: fit-content;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--color-on-surface-variant);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.tab.active {
+  background: var(--color-surface-elevated);
+  color: var(--color-on-surface);
+  box-shadow: var(--shadow-1);
+}
+
+.tab:hover:not(.active):not(:disabled) {
+  color: var(--color-on-surface);
+  background: var(--color-surface-variant);
+}
+
+.tab:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tab-badge {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+/* ─── Tema oscuro ─── */
+:root[data-theme="dark"] .tabs {
+  background: var(--color-surface);
+  border-color: var(--color-outline-variant);
+}
+
+:root[data-theme="dark"] .tab.active {
+  background: var(--color-surface-elevated);
+  color: var(--color-on-surface);
+}
+
+:root[data-theme="dark"] .tab:hover:not(.active):not(:disabled) {
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface);
+}

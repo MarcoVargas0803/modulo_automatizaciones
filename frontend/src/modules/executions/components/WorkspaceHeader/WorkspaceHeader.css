@@ -1,0 +1,85 @@
+/* Zona «Contexto»: vive directo sobre el lienzo, sin caja propia (Parte IV
+   del documento de diseño). Ya no es sticky (Parte X): tapaba contenido al
+   hacer scroll en pantallas bajas — "reduce fatiga" (Parte I) pesa más que
+   "siempre visible" (Parte V) cuando ambos chocan. El Topbar sigue siendo el
+   único elemento realmente persistente. */
+.workspace-header {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-color: var(--color-background);
+  padding: 12px 0;
+}
+
+/* Saludo+fecha y veredicto: dos bloques que sí tiene sentido separar a los
+   extremos (a diferencia de cuando el selector de proceso vivía en medio de
+   esta misma fila — eso dejaba un hueco enorme sin nada que lo justificara,
+   ver historial de esta sección). Con solo dos bloques, `space-between` es
+   el patrón normal, no el que causaba el hueco. El selector de proceso baja
+   a su propia fila, debajo. */
+.workspace-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.workspace-header-title {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--color-on-surface);
+}
+
+.workspace-header-date {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-muted-text);
+  text-transform: capitalize;
+}
+
+.workspace-header-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-label);
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+
+.workspace-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.workspace-status-success {
+  background-color: var(--color-success);
+}
+
+.workspace-status-error {
+  background-color: var(--color-error);
+}
+
+.workspace-status-info {
+  background-color: var(--color-info);
+}
+
+.workspace-status-text {
+  color: var(--color-on-surface);
+  font-weight: 600;
+}
+
+.workspace-header-lastsync {
+  color: var(--color-muted-text);
+}
+
+.workspace-process-tabs {
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}

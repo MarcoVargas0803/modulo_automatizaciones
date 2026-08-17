@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+
+# Build outputs
+dist/
+backend/public/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Runtime artifacts
+*.log
+npm-debug.log*
+backend/cookies.txt
+
+# Local backup / duplicated snapshots
+*.bak
+*.bak.*
+*.save
+
+# Datos generados por skills locales
+*.csv
+*.py
+*.pyc
+n8n/
+
+# Configuración de agentes: las convenciones SÍ se versionan (contrato de equipo).
+# Solo se ignora lo que es local de cada máquina.
+.claude/settings.local.json
+.claude/*.local.json
+
+# Análisis local del código
+graphify-out/
+
+# frontend/vite.config.dev.js SÍ se versiona: docker-compose.dev.yml lo invoca
+# con `--config vite.config.dev.js`, así que ignorarlo dejaba el entorno de
+# desarrollo roto en un clon limpio hasta que cada persona lo recreaba a mano.

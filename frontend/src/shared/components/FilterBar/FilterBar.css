@@ -1,0 +1,299 @@
+/* FilterBar — Barra de filtros en formato tarjeta.
+ *
+ * Portado desde `pages/Logs/Logs.css`, donde estas reglas vivían acopladas a
+ * una sola página. Al mover el bloque se renombraron dos clases que estaban
+ * declaradas también en `components/ShipmentsFilterBar/ShipmentsFilterBar.css`
+ * con valores distintos (`.search-icon` a la izquierda aquí y a la derecha
+ * allá): como el CSS del proyecto es global, ganaba la hoja que cargara última
+ * y el icono de búsqueda saltaba de lado según por dónde hubieras navegado.
+ *
+ * Ese archivo YA NO EXISTE: compras internacionales consume este componente
+ * desde que se retiró su clon. Los nombres prefijados se quedan igualmente —
+ * renombrarlos ahora tocaría las 7 páginas que los usan sin arreglar nada.
+ *
+ * Sin bloque de dark mode propio: todo sale de los tokens de `index.css`, que
+ * ya se redefinen en `:root[data-theme="dark"]`.
+ */
+
+.filter-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  /* Mismo escalón que `.page-header`, `.tabs` y `.summary-cards`: las
+   * páginas de Mantenimiento son bloques sin `gap`, así que la separación con
+   * el contenido de abajo tiene que salir de aquí. Las páginas cuyo contenedor
+   * sí usa `gap` (Logs) lo neutralizan en su propia hoja. */
+  margin-bottom: var(--spacing-3);
+}
+
+.filter-bar {
+  /* Punto de ajuste por página: redefinir sobre la clase extra que se le pase
+   * al componente. */
+  --filter-bar-field-min-width: 170px;
+
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  /* Se listan las propiedades en vez de `all` para no animar el layout. */
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.filter-bar:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-2);
+}
+
+/* ─── Caja de búsqueda ──────────────────────────────────────── */
+/* 360px recortaba el placeholder más largo en uso hoy ("Buscar por ID,
+   proceso, referencia o documento…", en Logs). 440px lo cubre sin forzar
+   el ancho en los consumidores con placeholders cortos: sigue siendo un
+   máximo, no un ancho fijo. */
+.filter-bar__search {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+}
+
+/* El hueco a ambos lados se reserva siempre, no solo cuando hay texto: si el
+ * padding cambiara al aparecer el botón de limpiar, el placeholder daría un
+ * salto al escribir el primer carácter. */
+.filter-bar__search .input-field {
+  width: 100%;
+  padding-left: 36px;
+  padding-right: 36px;
+}
+
+.filter-bar__search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-on-surface-variant);
+  pointer-events: none;
+}
+
+.filter-bar__search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.filter-bar__search-clear:hover {
+  opacity: 1;
+}
+
+.filter-bar__search-clear:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 1px;
+}
+
+/* ─── Filtros en línea (showDropdown={false}) ───────────────── */
+.filter-bar__inline {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  /* `flex-end` alinea los controles entre sí aunque unos tengan etiqueta y
+   * otros no. */
+  align-items: flex-end;
+  gap: var(--spacing-2);
+}
+
+/* Los campos llevan `filter-bar__field` y no un `filter-field` a secas porque
+ * ese nombre lo tenía tomado ShipmentsFilterBar.css, cuya regla
+ * `.filter-field select { background: … }` —shorthand— borraba la flecha que
+ * Select.css dibuja con background-image. Ese archivo ya se retiró; el prefijo
+ * se conserva por los 7 consumidores actuales. */
+.filter-bar__inline .filter-bar__field {
+  width: auto;
+  min-width: var(--filter-bar-field-min-width);
+}
+
+/* ─── Acciones y disparador del panel ──────────────────────── */
+.filter-bar__actions {
+  /* Ancla del panel desplegable. */
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 12px;
+}
+
+.filter-bar__trigger {
+  /* Ancla del punto indicador. */
+  position: relative;
+}
+
+.filter-bar__dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+}
+
+/* Mismo punto de anclaje que `.filter-bar__dot`, pero con la cifra real de
+   filtros activos en vez de solo un punto — se usa cuando hay `chips` que
+   contar; el punto se conserva para el caso sin chips (p. ej. solo texto de
+   búsqueda). */
+.filter-bar__count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-label);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* ─── Panel desplegable ─────────────────────────────────────── */
+.filter-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 300px;
+  max-width: calc(100vw - var(--spacing-4));
+  padding: var(--spacing-3);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  z-index: var(--z-dropdown);
+  /* Se monta al pulsar "Filtrar", nunca acompaña a la carga de la página: es un
+     cambio de estado por acción del usuario y anima por su cuenta. Más corto que
+     el resto —el panel responde a un clic y debe sentirse inmediato. */
+  animation: fade-in var(--transition-fast) var(--ease-standard) both;
+}
+
+.filter-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-2);
+}
+
+.filter-panel__title {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+}
+
+.filter-panel__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.filter-panel__close:hover {
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface);
+}
+
+.filter-panel__close:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 1px;
+}
+
+.filter-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.filter-panel__actions {
+  display: flex;
+  gap: var(--spacing-1);
+  margin-top: var(--spacing-1);
+}
+
+/* ─── Chips de filtros activos ──────────────────────────────── */
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-variant);
+  color: var(--color-on-surface);
+  font-family: var(--font-label);
+  font-size: 0.8rem;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-chip:hover {
+  border-color: var(--color-secondary);
+}
+
+.filter-chip:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+.filter-chip--clear {
+  background: transparent;
+  border-style: dashed;
+  color: var(--color-on-surface-variant);
+}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-bar__search {
+    max-width: 100%;
+  }
+
+  .filter-bar__inline .filter-bar__field {
+    width: 100%;
+  }
+
+  .filter-bar__actions {
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .filter-panel {
+    width: 100%;
+  }
+}

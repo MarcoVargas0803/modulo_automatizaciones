@@ -1,0 +1,176 @@
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* auto-fit y no un `repeat(4, ...)` fijo: con menos de 4 tarjetas (ej. "Salud
+   del proceso" con solo 2), un template fijo dejaba columnas vacías como
+   hueco muerto en vez de dejar que las tarjetas existentes llenaran la fila. */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* "Mi trabajo": mismas tarjetas que .dashboard-grid, pero más anchas (menos
+   por fila) para que pesen más que las de diagnóstico de "Salud del
+   proceso" — sin crear una variante nueva de DataCard. */
+.dashboard-grid--action {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Rejilla de las gráficas por proceso. Hasta dos por fila en escritorio (una
+   gráfica categórica con menos de ~360px de ancho pierde legibilidad en las
+   etiquetas del eje), pero auto-fit y no un `repeat(2, ...)` fijo: con una
+   sola gráfica (la mayoría de los procesos solo tienen una), la segunda
+   columna se quedaba vacía como hueco muerto hasta la barra lateral de
+   Actividad reciente. */
+.dashboard-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1rem;
+}
+
+/* Aviso a ancho completo entre secciones (estados fuera de vocabulario, KPIs de
+   proceso no disponibles). Menos peso visual que una .dashboard-section. */
+/* Columna principal (KPIs/gráficas/tabla) + panel de actividad reciente. Se
+   colapsa a una sola columna en el mismo punto que el resto de las grillas de
+   la página. */
+.dashboard-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 288px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.dashboard-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.dashboard-columns .timeline-panel {
+  position: sticky;
+  top: 16px;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-columns .timeline-panel {
+    position: static;
+  }
+}
+
+/* Zona «Corriente»: la gráfica de tendencia vive en el flujo de la columna
+   principal, sin caja propia (Parte IV) — solo un título de sección arriba. */
+.dashboard-trend {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-notice {
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2);
+  box-shadow: var(--shadow-1);
+}
+
+.dashboard-section {
+  background-color: var(--color-surface-elevated);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-1);
+  transition: all var(--transition-base);
+}
+
+.dashboard-section:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-2);
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  margin: 0;
+  color: var(--color-on-surface);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted-text);
+  font-size: 0.875rem;
+}
+
+.section-link {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+.execution-id-cell {
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  color: var(--color-on-surface);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1180px) {
+
+  .dashboard-grid,
+  .dashboard-chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .dashboard-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-grid,
+  .dashboard-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-link {
+    white-space: normal;
+  }
+}

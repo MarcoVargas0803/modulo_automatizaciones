@@ -1,0 +1,8 @@
+/* Contenedor por defecto de los avisos del guard.
+   Existe solo para que un aviso no salga pegado al borde cuando la página no
+   pasa su propia clase por `className`. Las páginas que ya tienen contenedor
+   (`workbench-page`, `docs-page`, `material-revaluations-page`) siguen usando el
+   suyo y esta regla no llega a aplicarse. */
+.process-guard-message {
+  padding: var(--spacing-3);
+}

@@ -1,0 +1,16 @@
+.git
+.gitignore
+.github
+.claude
+docs
+
+node_modules
+npm-debug.log
+
+backend/node_modules
+backend/public
+backend/cookies.txt
+backend/.env
+
+frontend/node_modules
+frontend/dist

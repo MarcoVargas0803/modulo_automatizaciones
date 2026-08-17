@@ -1,0 +1,843 @@
+{
+  "name": "Flujo_principal_tracking",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Flujo creado para poder realizar un tracking Request\nEsto es de ejemplo para la implementación previa al Weebhook\n",
+        "height": 224,
+        "width": 256
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7776,
+        2272
+      ],
+      "id": "833922de-2f44-4fd6-bfb7-d9e9ce18132f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Creamos Tracking Request\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        8064,
+        2272
+      ],
+      "id": "1e101422-391b-429d-950d-07eebf4fe871",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Ejemplos utilizados de BLs:\nMEDUFM228344\nMEDUFM228047\nQGD2885433\nHLCUMVD260407232\nHLCUSS5260478045\nHLCUMVD260600083\n\n",
+        "height": 256,
+        "width": 256
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7488,
+        2272
+      ],
+      "id": "5262ede3-8d6e-4517-87be-9e9ded91022d",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Requerimientos minimos para poder realizar el HTTP Request a Terminal 49\nSCAC y MBL. \nSe va a realizar una posible implementación para determinar el SCAC del embarque.\n",
+        "height": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        8336,
+        2272
+      ],
+      "id": "ed666c0f-6e2d-4ba8-8ddc-b2b067fd1511",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Mandatory Headers para SafeCube\nHost: api.sinay.ai\nContent-Type: application/json\nContent-Length: 411",
+        "height": 208,
+        "width": 256
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        8608,
+        2272
+      ],
+      "id": "ee4e2098-3db5-425f-a9e7-46ad6d88d945",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Cambiar el MBL no requiere nada aquí\nEste flujo **no guarda estado por `tracking_key`**: lo relee de `v_active_shipments_for_tracking` en cada corrida y actualiza por `shipment_id`.\n\nSi el portal corrige el MBL de un embarque, la clave vieja deja de consultarse sola y la nueva entra en el siguiente sondeo.\n\nEl webhook ignora su cuerpo: es solo un «recorre todos ahora». Refresco selectivo pendiente — ver punto 7 de `docs/pendientes-coordinacion-compras-internacionales.md`.",
+        "height": 320,
+        "width": 300,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7776,
+        3392
+      ],
+      "id": "b1a7c9d2-0e44-4f31-9c88-2a1f6e7b5c10",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "url": "https://api.sinay.ai/container-tracking/api/v2/shipment",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "shipmentNumber",
+              "value": "={{ $json.tracking_key }}"
+            },
+            {
+              "name": "sealine",
+              "value": "={{ $json.scac }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 5,
+              "batchInterval": 10000
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        8944,
+        2992
+      ],
+      "id": "2a10d356-3eea-4090-9543-377288527f1c",
+      "name": "GET Shipment",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "dgZVJAMRBtypRG88",
+          "name": "SafeCube API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        7872,
+        3008
+      ],
+      "id": "32346ad3-483e-418e-814e-09dbbd7208d7",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM international_purchases.v_active_shipments_for_tracking;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        8432,
+        3008
+      ],
+      "id": "0df1eaa2-aef1-418b-8202-b907ccdea70e",
+      "name": "SELECT FROM v_active_shipment_for_tracking",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const shipment = $json;\nconst previous = $(\"SELECT FROM v_active_shipment_for_tracking\").item.json;\nconst previousEta = previous.eta;\nconst previousEtd = previous.etd;\nconst previousAtd = previous.atd;\nconst previousAta = previous.ata;\nconst previousStatus = previous.shipment_status;\n\nfunction splitMilestone(milestone) {\n  if (!milestone?.date) return { estimated: null, actual: null };\n  return milestone.actual\n    ? { estimated: null, actual: milestone.date }\n    : { estimated: milestone.predictiveEta || milestone.date, actual: null };\n}\n\n// Fecha calendario en zona de negocio (Mexico): estable entre corridas -> corta el loop DATE/TZ\nfunction toBusinessDate(dateValue) {\n  if (!dateValue) return null;\n  const d = new Date(dateValue);\n  if (isNaN(d.getTime())) return null;\n  return d.toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });\n}\n\n// Formatear fecha a timestamp con zona horaria compatible con PostgreSQL\nfunction toPostgresTimestamp(dateValue) {\n  if (!dateValue) return null;\n  const d = new Date(dateValue);\n  if (isNaN(d.getTime())) return null;\n  \n  const pad = (num, size = 2) => String(num).padStart(size, '0');\n  \n  const year = d.getUTCFullYear();\n  const month = pad(d.getUTCMonth() + 1);\n  const day = pad(d.getUTCDate());\n  const hours = pad(d.getUTCHours());\n  const minutes = pad(d.getUTCMinutes());\n  const seconds = pad(d.getUTCSeconds());\n  const ms = pad(d.getUTCMilliseconds(), 3);\n  \n  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${ms}000+00`;\n}\n\nconst pol = shipment.route?.pol;\nconst { estimated: polEstimated, actual: atd } = splitMilestone(pol);\nconst etd = atd ? null : polEstimated;\n\nconst pod = shipment.route?.pod;\nconst { estimated: podEstimated, actual: ata } = splitMilestone(pod);\nconst eta = ata ? null : podEstimated;\n\nconst newEta = eta ?? previousEta;\n\nconst apiStatus = shipment.metadata?.shippingStatus ?? null;\nconst shipmentStatus = apiStatus !== null ? apiStatus : previousStatus;\n\nlet terminal = null;\nfor (const container of shipment.containers ?? []) {\n  const discEvent = container.events?.find(e => e.eventCode === 'DISC');\n  if (discEvent?.facility?.name) {\n    terminal = discEvent.facility.name;\n    break;\n  }\n}\n\nfunction fieldChanged(prevValue, newValue) {\n  return toBusinessDate(prevValue) !== toBusinessDate(newValue);\n}\n\nconst changeCandidates = [\n  { field: 'ata', changed: fieldChanged(previousAta, ata),    oldValue: previousAta, newValue: ata },\n  { field: 'atd', changed: fieldChanged(previousAtd, atd),    oldValue: previousAtd, newValue: atd },\n  { field: 'eta', changed: fieldChanged(previousEta, newEta), oldValue: previousEta, newValue: newEta },\n  { field: 'etd', changed: fieldChanged(previousEtd, etd),    oldValue: previousEtd, newValue: etd },\n];\n\nconst detectedChange = changeCandidates.find(c => c.changed);\nconst fieldName = detectedChange?.field ?? null;\n\nconst oldDateValue = toBusinessDate(detectedChange?.oldValue ?? null);\nconst newDateValue = toBusinessDate(detectedChange?.newValue ?? null);\n\n//Fecha del metadata: \nconst ultima_actualizacion = toPostgresTimestamp(shipment.metadata?.updatedAt);\n\n//Actualización 16/07/26 añadido shipment_type\nconst shipment_type = (shipment.metadata?.shipmentType ?? null);\n\n//shipmentNumber = tracking_key\n\nconst shipment_number = (shipment.metadata?.shipmentNumber ?? null);\nconst w = shipment.metadata?.warnings;\nconst warnings = Array.isArray(w) && w.length > 0 ? w : [];\nreturn {\n  json: {\n    shipment_id: previous.shipment_id,\n    tracking_key: shipment_number,\n    shipment_type: shipment_type,\n    eta: toBusinessDate(newEta),\n    etd: toBusinessDate(etd),\n    atd: toBusinessDate(atd),\n    ata: toBusinessDate(ata),\n    shipment_status: shipmentStatus,\n    terminal: terminal,\n    ultima_actualizacion: ultima_actualizacion,\n    field_name: fieldName,\n    old_date_value: oldDateValue,\n    new_date_value: newDateValue,\n    tracking_source: 'SAFECUBE_API',\n    tracking_status: apiStatus,\n    audit_execution_id: $('Set Request_ID').first().json.request_id,\n    n8n_execution_id: $execution.id,\n    warnings: warnings,\n    raw_tracking_payload: shipment\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9552,
+        2992
+      ],
+      "id": "16f873eb-7e04-4d1c-941e-0df9e9686187",
+      "name": "Calculate ETA and Dates"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "/** Update international_purchases.shipments **/\nUPDATE international_purchases.shipments\nSET\n  eta = COALESCE(NULLIF($1,'null')::date, eta),\n  etd = COALESCE(NULLIF($2,'null')::date, etd),\n  atd = COALESCE(NULLIF($3,'null')::date, atd),\n  ata = COALESCE(NULLIF($4,'null')::date, ata),\n\n  /** shipment_status y shipment_type vienen tal cual de SafeCube y la tabla tiene\n      CHECK sobre ambos: shipment_status IN (PLANNED, IN_TRANSIT, DELIVERED, UNKNOWN)\n      y shipment_type IN (CT, BL, BK, DC). Un valor nuevo de la API reventaba el\n      UPDATE COMPLETO con error 23514 y se perdian tambien las fechas. Ahora un valor\n      desconocido simplemente se ignora y se conserva el anterior. **/\n  shipment_status = CASE\n    WHEN NULLIF($5,'null') IN ('PLANNED','IN_TRANSIT','DELIVERED','UNKNOWN') THEN $5\n    ELSE shipment_status\n  END,\n  shipment_type = CASE\n    WHEN NULLIF($19,'null') IN ('CT','BL','BK','DC') THEN $19\n    ELSE shipment_type\n  END,\n\n  terminal = COALESCE(NULLIF($6,'null'), terminal),\n  warnings = COALESCE((SELECT ARRAY(SELECT jsonb_array_elements_text($7::jsonb))), '{}'::text[]),\n  last_tracking_error = NULL,\n  last_tracking_error_at = NULL,\n\n  /** updated_at es NOT NULL. Si SafeCube no manda metadata.updatedAt, la expresion\n      anterior evaluaba a NULL y el UPDATE fallaba entero con error 23502. El COALESCE\n      conserva el valor previo en ese caso. **/\n  updated_at = COALESCE(NULLIF(NULLIF($18, ''), 'null')::timestamptz, updated_at)\nWHERE shipment_id = $9;\n\n/** Historial: solo si hubo un cambio real de fecha **/\nINSERT INTO international_purchases.shipment_tracking_history (\n  shipment_id,\n  tracking_key,\n  field_name,\n  old_date_value,\n  new_date_value,\n  tracking_source,\n  tracking_status,\n  raw_tracking_payload,\n  audit_execution_id,\n  n8n_execution_id\n)\nSELECT\n  $9::uuid,\n  $8,\n  $10,\n  NULLIF($11,'null')::TIMESTAMPTZ,\n  NULLIF($12,'null')::TIMESTAMPTZ,\n  $13,\n  $14,\n  NULLIF($17,'null')::jsonb,\n  $15,\n  $16\nWHERE NULLIF($10,'null') IS NOT NULL;",
+        "options": {
+          "queryBatching": "independently",
+          "queryReplacement": "={{ $json.eta }},{{ $json.etd }},{{ $json.atd }},{{ $json.ata }},{{ $json.shipment_status }},{{ $json.terminal }},{{ JSON.stringify($json.warnings)}},{{ $json.tracking_key }},{{ $json.shipment_id }},{{ $json.field_name }},{{ $json.old_date_value }},{{ $json.new_date_value }},{{ $json.tracking_source }},{{ $json.tracking_status }},{{ $json.audit_execution_id }},{{ $json.n8n_execution_id }},{{ JSON.stringify($json.raw_tracking_payload) }}, {{ $json.ultima_actualizacion }}, {{ $json.shipment_type }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9776,
+        2992
+      ],
+      "id": "638ab266-174d-4666-9e27-4af679cab691",
+      "name": "UPDATE ETA And Dates",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "international-purchases/register-tracking",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        7872,
+        3216
+      ],
+      "id": "48046c06-49d1-4923-a08a-89cc5b0b6844",
+      "name": "Webhook",
+      "webhookId": "870ab9e2-0d2c-45af-a834-3ac272b7c55b"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const requestId = ['TRK', Date.now(), Math.random().toString(36).substring(2, 8).toUpperCase()].join('-');\n\n// NOTA: este flujo NO guarda estado por tracking_key. Relee la clave de\n// v_active_shipments_for_tracking en cada corrida y actualiza por shipment_id, asi\n// que si el portal corrige el MBL de un embarque, la clave vieja deja de\n// consultarse sola y la nueva entra en el siguiente sondeo. No hace falta avisar a\n// n8n de la clave anterior.\n//\n// El cuerpo del webhook se ignora a proposito: hoy el webhook es solo un \"recorre\n// todos ahora\". Ver el refresco selectivo pendiente en\n// docs/pendientes-coordinacion-compras-internacionales.md (punto 7).\n\nreturn {\n  json: {\n    request_id: requestId\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8096,
+        3008
+      ],
+      "id": "fe0e23b3-2ba8-46b0-a96e-a6183ecba677",
+      "name": "Set Request_ID"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit.workflow_execution (\n  execution_id,\n  workflow_name,\n  status,\n  n8n_workflow_id,\n  business_key,\n  trigger_type,\n  trigger_source,\n  source_system,\n  process_code\n)\nVALUES (\n  '{{ $json.request_id }}',\n  '{{ $workflow.name }}',\n  'STARTED',\n  '{{ $workflow.id }}',\n  '{{ $json.request_id }}',\n  'Schedule and Webhook TRIGGER',\n  'FROM international_purchases.shipments',\n  'DATABASE',\n  'international_purchases'\n)\nON CONFLICT (execution_id) DO UPDATE SET\n  workflow_name = EXCLUDED.workflow_name,\n  status = EXCLUDED.status,\n  n8n_workflow_id = EXCLUDED.n8n_workflow_id,\n  business_key = EXCLUDED.business_key,\n  trigger_type = EXCLUDED.trigger_type,\n  trigger_source = EXCLUDED.trigger_source,\n  source_system = EXCLUDED.source_system,\n  process_code = EXCLUDED.process_code,\n  updated_at = NOW();",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        8304,
+        2704
+      ],
+      "id": "14d3d6fa-8256-43b6-af49-8f56a72b912d",
+      "name": "AUDIT Start Ejecución",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, error_message, payload\n)\nSELECT\n  COALESCE(\n    NULLIF(NULLIF(NULLIF($audit${{ $('Set Request_ID').first().json.request_id }}$audit$, ''), 'null'), 'undefined'),\n    'ERR-' || gen_random_uuid()::text\n  ),\n  'ERROR',\n  'Error de tracking (embarque)',\n  'GET Shipment',\n  'ERROR',\n  'WARNING',\n  $audit${{ \"Error: \" + $json.parsedMessage.errorCode + \" \" + $json.parsedMessage.details }}$audit$,\n  $audit${{ JSON.stringify($json.parsedMessage) }}$audit$::jsonb;",
+        "options": {
+          "queryBatching": "independently"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9584,
+        3456
+      ],
+      "id": "0fe9d8c1-70b3-45d3-9eea-ac1b9f889dea",
+      "name": "AUDIT ERR GET Shipment",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, payload\n) VALUES (\n  '{{ $('Set Request_ID').first().json.request_id }}',\n  'API Request',\n  'GET Shipment hacia API safecube endpoint /shipment',\n  'GET Shipment',\n  'SUCCESS', 'INFO',\n  $audit${{ JSON.stringify($json.metadata) }}$audit$::jsonb\n);",
+        "options": {
+          "queryBatching": "independently"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9136,
+        2624
+      ],
+      "id": "0e535cf9-55a4-4fae-b1c4-eda32e8d6f72",
+      "name": "AUDIT y EVENT GET Shipment",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH ctx AS (\n  SELECT\n    COALESCE(\n      NULLIF(NULLIF(NULLIF($audit${{ $('Set Request_ID').first().json.request_id }}$audit$, ''), 'null'), 'undefined'),\n      'ERR-' || gen_random_uuid()::text\n    ) AS execution_id,\n    $audit${{ $workflow.name }}$audit$ AS workflow_name,\n    $audit${{ $workflow.id }}$audit$ AS n8n_workflow_id,\n    $audit${{ JSON.stringify({ cierre_tecnico: true, mensaje: \"Flujo finalizado de actualización de ETA\", ultimo_nodo: \"UPDATE ETA And Dates\", closed_at: new Date().toISOString() }) }}$audit$::jsonb AS final_event_payload\n),\nensure_execution_success AS (\n  INSERT INTO audit.workflow_execution (\n    execution_id, workflow_name, status, n8n_workflow_id,\n    business_key, trigger_type, source_system, process_code, completed_at\n  )\n  SELECT\n    execution_id, workflow_name, 'SUCCESS', n8n_workflow_id,\n    execution_id, 'SafeCube', 'API', 'international_purchases', NOW()\n  FROM ctx\n  ON CONFLICT (execution_id) DO UPDATE SET\n    workflow_name   = EXCLUDED.workflow_name,\n    status          = 'SUCCESS',\n    n8n_workflow_id = EXCLUDED.n8n_workflow_id,\n    process_code    = 'international_purchases',\n    error_message   = NULL,\n    error_payload   = NULL,\n    completed_at    = COALESCE(audit.workflow_execution.completed_at, NOW()),\n    updated_at      = NOW()\n  RETURNING execution_id\n)\nINSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, payload\n)\nSELECT\n  ensure_execution_success.execution_id,\n  'END', 'Flujo finalizado correctamente', 'AUDIT Éxito Final',\n  'SUCCESS', 'INFO', ctx.final_event_payload\nFROM ensure_execution_success\nCROSS JOIN ctx;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        10608,
+        2960
+      ],
+      "id": "1483213e-64b0-432c-be71-b7086ce133a3",
+      "name": "AUDIT Éxito Final",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, payload\n) VALUES (\n  '{{ $('Set Request_ID').first().json.request_id }}',\n  'UPDATE DB',\n  'UPDATE Exitoso hacia tabla international_purchases.shipments',\n  'UPDATE ETA And Dates',\n  'SUCCESS', 'INFO',\n  $audit${{ JSON.stringify({ ok: true, tracking_key: $json.tracking_key ?? null }) }}$audit$::jsonb\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        10304,
+        2736
+      ],
+      "id": "bd828a1e-976f-4036-8371-0baeec7520f8",
+      "name": "AUDIT Update ETA And Dates",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, error_message, payload\n)\nSELECT\n  COALESCE(\n    NULLIF(NULLIF(NULLIF($audit${{ $('Set Request_ID').first().json.request_id }}$audit$, ''), 'null'), 'undefined'),\n    'ERR-' || gen_random_uuid()::text\n  ),\n  'ERROR',\n  'Error en UPDATE ETA And Dates (embarque)',\n  'UPDATE ETA And Dates',\n  'ERROR',\n  'WARNING',\n  $audit${{ '[' + ($json.tracking_key ?? 'SIN_TRACKING_KEY') + '] ' + ($json.error?.description ?? $json.message ?? '') }}$audit$,\n  $audit${{ JSON.stringify($json) }}$audit$::jsonb;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        10432,
+        3184
+      ],
+      "id": "64fad49a-e43b-46d1-a2e0-de0eb28bce5a",
+      "name": "AUDIT ERR Update ETA And Dates",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, payload\n) VALUES (\n  '{{ $('Set Request_ID').first().json.request_id }}',\n  'SELECT',\n  $audit$SELECT exitoso: {{ $('SELECT FROM v_active_shipment_for_tracking').all().length }} embarques activos$audit$,\n  'SELECT FROM v_active_shipment_for_tracking',\n  'SUCCESS', 'INFO',\n  $audit${{ JSON.stringify({ count: $('SELECT FROM v_active_shipment_for_tracking').all().length }) }}$audit$::jsonb\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        8800,
+        2608
+      ],
+      "id": "2b470349-715a-478f-8db0-29be617a7c25",
+      "name": "AUDIT SELECT FROM V_active_shipment_for_tracking",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH ctx AS (\n  SELECT\n    COALESCE(\n      NULLIF(NULLIF(NULLIF($audit${{ $('Set Request_ID').first().json.request_id }}$audit$, ''), 'null'), 'undefined'),\n      'ERR-' || gen_random_uuid()::text\n    ) AS execution_id,\n    $audit${{ $workflow.name }}$audit$ AS workflow_name,\n    $audit${{ $workflow.id }}$audit$ AS n8n_workflow_id,\n    $audit${{ \"Error en SELECT FROM v_active_shipment_for_tracking: [\" + ($json.error?.level ?? '') + \"] \" + ($json.error?.description ?? '') }}$audit$ AS error_message,\n    $audit${{ $json.mensaje_operador ?? $json.mensaje ?? $json.error?.message ?? \"Error desconocido\" }}$audit$ AS event_error_message,\n    $audit${{ JSON.stringify($json) }}$audit$::jsonb AS error_payload\n),\nupsert_execution AS (\n  INSERT INTO audit.workflow_execution (\n    execution_id, workflow_name, status, n8n_workflow_id,\n    trigger_type, source_system, process_code,\n    error_message, error_payload, completed_at\n  )\n  SELECT\n    execution_id, workflow_name, 'ERROR', n8n_workflow_id,\n    'SELECT DB', 'PostgreSQL', 'international_purchases',\n    error_message, error_payload, NOW()\n  FROM ctx\n  ON CONFLICT (execution_id) DO UPDATE SET\n    workflow_name   = EXCLUDED.workflow_name,\n    status          = 'ERROR',\n    n8n_workflow_id = EXCLUDED.n8n_workflow_id,\n    process_code    = EXCLUDED.process_code,\n    completed_at    = NOW(),\n    error_message   = EXCLUDED.error_message,\n    error_payload   = EXCLUDED.error_payload,\n    updated_at      = NOW()\n  RETURNING execution_id\n)\nINSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, error_message, payload\n)\nSELECT\n  upsert_execution.execution_id,\n  'ERROR', 'Error EN SELECT', 'SELECT FROM v_active_shipment_for_tracking',\n  'ERROR', 'ERROR',\n  ctx.event_error_message, ctx.error_payload\nFROM upsert_execution\nCROSS JOIN ctx;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        8832,
+        3184
+      ],
+      "id": "cad97332-1018-4a19-bf16-1afdf8b09c46",
+      "name": "AUDIT ERR SELECT FROM V_active_shipment_for_tracking",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const errorData = $json;\nconst errorMessage = errorData?.error?.message\n  || errorData?.message\n  || 'Error desconocido en UPDATE ETA And Dates';\nconst trackingKey = errorData?.tracking_key\n  || errorData?.metadata?.shipmentNumber\n  || 'SIN_TRACKING_KEY';\n\nreturn {\n  json: {\n    error: {\n      message: errorMessage,\n      level: errorData?.error?.level || 'error',\n      description: errorData?.error?.description || errorMessage\n    },\n    tracking_key: trackingKey,\n    message: errorMessage,\n    ...errorData\n  }\n};\n"
+      },
+      "id": "5bf62018-d3e9-48ae-917f-538f6a0bd981",
+      "name": "Parse Update Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10192,
+        3184
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const rawMessage = $input.item.json.error?.message ?? '';\nlet parsedMessage;\ntry {\n  const jsonString = rawMessage.substring(rawMessage.indexOf('{'), rawMessage.lastIndexOf('}') + 1);\n  parsedMessage = JSON.parse(jsonString.replace(/\\\\\"/g, '\"'));\n} catch (e) {\n  parsedMessage = { message: rawMessage, errorCode: 'PARSE_ERROR', details: String(e) };\n}\n\nconst tracking_key = $input.item.json.tracking_key\n  ?? $input.item.json.metadata?.shipmentNumber\n  ?? $(\"SELECT FROM v_active_shipment_for_tracking\").item.json.tracking_key ?? null;\n\nconst shipment_id = $(\"SELECT FROM v_active_shipment_for_tracking\").item.json.shipment_id ?? null;\n\nreturn { json: { shipment_id, tracking_key, parsedMessage } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9248,
+        3136
+      ],
+      "id": "731ffa17-a1e5-4f1c-9e65-ad910b004904",
+      "name": "Parse Response For Errors"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE international_purchases.shipments\nSET last_tracking_error = NULLIF($1,'null')::jsonb,\n    last_tracking_error_at = NOW()\nWHERE shipment_id = $2;",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify($json.parsedMessage) }},{{ $json.shipment_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9584,
+        3232
+      ],
+      "id": "6f520b67-c1fc-4c44-bba1-019e0f44bc82",
+      "name": "UPDATE Tracking Error",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## Checar cambio de tracking_key a shipment_id",
+        "height": 144
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        8928,
+        3376
+      ],
+      "id": "83ce55a2-4915-4556-b2d3-730b747a0249",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Agregar excepción para errores 200"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        10080,
+        2496
+      ],
+      "id": "190f7d0a-01ab-49d1-9c14-5bad7c0e8430",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO audit.workflow_events (\n  execution_id, event_type, event_name, node_name,\n  status, event_level, error_message, payload\n)\nSELECT\n  COALESCE(\n    NULLIF(NULLIF(NULLIF($audit${{ $('Set Request_ID').first().json.request_id }}$audit$, ''), 'null'), 'undefined'),\n    'ERR-' || gen_random_uuid()::text\n  ),\n  'ERROR',\n  'Error de tracking (embarque)',\n  'GET Shipment',\n  'ERROR',\n  'WARNING',\n  $audit${{ \"Error: \" + $json.errorCode + \" - \" + $json.details}}$audit$,\n  $audit${{ JSON.stringify($json) }}$audit$::jsonb;",
+        "options": {
+          "queryBatching": "independently"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9760,
+        2736
+      ],
+      "id": "04d60fbc-1a62-4e7f-9ff6-b8686d1ef430",
+      "name": "AUDIT ERR GET Shipment1",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE international_purchases.shipments\nSET last_tracking_error = NULLIF($1,'null')::jsonb,\n    last_tracking_error_at = NOW()\nWHERE shipment_id = $2;",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify($json) }},{{ $json.shipment_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9760,
+        2512
+      ],
+      "id": "726424c0-7e7c-4354-9796-f78027523b2a",
+      "name": "UPDATE Tracking Error1",
+      "credentials": {
+        "postgres": {
+          "id": "xzTRBX2nuIAxhi6M",
+          "name": "Postgres account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "49a072b9-b9c9-463c-957d-f2a8600a7ae4",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "=SEALINE_HASNT_PROVIDE_INFO",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "ccbe7bdf-7d29-4396-a3b4-792910883c4b",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "=SEALINE_CANCELED_SHIPMENT",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        9248,
+        2976
+      ],
+      "id": "6300af31-ffe0-4e08-9825-37c4fd4a4abd",
+      "name": "Error 200?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "703ddb2a-d010-4650-9c88-7df0ae77d39b",
+              "name": "shipment_id",
+              "value": "={{ $('SELECT FROM v_active_shipment_for_tracking').item.json.shipment_id }}",
+              "type": "string"
+            },
+            {
+              "id": "056db4f2-e3a4-4672-a292-22ac7b229666",
+              "name": "tracking_key",
+              "value": "={{ $('SELECT FROM v_active_shipment_for_tracking').item.json.tracking_key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9408,
+        2800
+      ],
+      "id": "1346954b-b67a-439b-95b1-6e59d7e1ecfe",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "GET Shipment": {
+      "main": [
+        [
+          {
+            "node": "AUDIT y EVENT GET Shipment",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Error 200?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Response For Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Request_ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SELECT FROM v_active_shipment_for_tracking": {
+      "main": [
+        [
+          {
+            "node": "GET Shipment",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AUDIT SELECT FROM V_active_shipment_for_tracking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AUDIT ERR SELECT FROM V_active_shipment_for_tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate ETA and Dates": {
+      "main": [
+        [
+          {
+            "node": "UPDATE ETA And Dates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Request_ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Request_ID": {
+      "main": [
+        [
+          {
+            "node": "SELECT FROM v_active_shipment_for_tracking",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AUDIT Start Ejecución",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UPDATE ETA And Dates": {
+      "main": [
+        [
+          {
+            "node": "AUDIT Update ETA And Dates",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AUDIT Éxito Final",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parse Update Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Update Error": {
+      "main": [
+        [
+          {
+            "node": "AUDIT ERR Update ETA And Dates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response For Errors": {
+      "main": [
+        [
+          {
+            "node": "AUDIT ERR GET Shipment",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "UPDATE Tracking Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error 200?": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Calculate ETA and Dates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "UPDATE Tracking Error1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AUDIT ERR GET Shipment1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "e0118f00-dd0f-4d11-8924-b763f054bbbd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "3edb5e8882c023575914346f5d2ac0f8df9035720c8a8b9f67f50c5edc5cf0c5"
+  },
+  "nodeGroups": [],
+  "id": "ri2o9rtOZipexprr",
+  "tags": []
+}

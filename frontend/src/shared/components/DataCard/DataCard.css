@@ -1,0 +1,174 @@
+.data-card {
+  background-color: var(--color-surface-elevated);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-1);
+  transition: all 0.2s ease;
+  animation: fade-in var(--transition-base) var(--ease-standard) both;
+}
+
+.data-card:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+
+.data-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.data-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-card-icon {
+  color: var(--color-secondary);
+}
+
+/* Color semántico (prop `tone`). Solo barra lateral e icono: el valor conserva
+   --color-on-surface para no perder contraste. Sin `tone` no se aplica ninguna
+   de estas reglas, así que las tarjetas existentes no cambian. */
+.data-card-success,
+.data-card-warning,
+.data-card-error,
+.data-card-info,
+.data-card-stuck {
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+
+.data-card-success {
+  border-left-color: var(--color-success);
+}
+
+.data-card-success .data-card-icon {
+  color: var(--color-success);
+}
+
+.data-card-warning {
+  border-left-color: var(--color-warning);
+}
+
+.data-card-warning .data-card-icon {
+  color: var(--color-warning);
+}
+
+.data-card-error {
+  border-left-color: var(--color-error);
+}
+
+.data-card-error .data-card-icon {
+  color: var(--color-error);
+}
+
+.data-card-info {
+  border-left-color: var(--color-info);
+}
+
+.data-card-info .data-card-icon {
+  color: var(--color-info);
+}
+
+.data-card-stuck {
+  border-left-color: var(--color-stuck);
+}
+
+.data-card-stuck .data-card-icon {
+  color: var(--color-stuck);
+}
+
+/* El hover unifica el borde en --color-secondary; sin esto la barra lateral
+   desaparecería al pasar el ratón sobre una tarjeta con tono. */
+.data-card-success:hover {
+  border-left-color: var(--color-success);
+}
+
+.data-card-warning:hover {
+  border-left-color: var(--color-warning);
+}
+
+.data-card-error:hover {
+  border-left-color: var(--color-error);
+}
+
+.data-card-info:hover {
+  border-left-color: var(--color-info);
+}
+
+.data-card-stuck:hover {
+  border-left-color: var(--color-stuck);
+}
+
+.data-card-title {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+}
+
+.data-card-content {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.data-card-value {
+  font-family: var(--font-headline);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-card-trend {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-label);
+  font-size: 14px;
+  font-weight: 500;
+  gap: 4px;
+}
+
+.trend-positive {
+  color: var(--color-success);
+}
+
+.trend-negative {
+  color: var(--color-error);
+}
+
+/* Sin dirección declarada: la cifra se muestra sin flecha ni juicio de valor. */
+.trend-neutral {
+  color: var(--color-muted-text);
+}
+
+.data-card-footer {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-surface-variant);
+}
+
+.data-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-primary);
+}
+
+.data-card-link:hover {
+  text-decoration: underline;
+}
